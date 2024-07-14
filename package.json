@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "start": "concurrently \"npm start --prefix agrogate-api\" \"npm start --prefix agrogate-client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
