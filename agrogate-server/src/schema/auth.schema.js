@@ -8,7 +8,7 @@ const createUserSchema = object({
 });
 
 const loginUserSchema = object({
-  emailmail: string({ required_error: "Email is required" }),
+  email: string({ required_error: "Email is required" }),
   password: string({ required_error: "Password is required" }),
 });
 

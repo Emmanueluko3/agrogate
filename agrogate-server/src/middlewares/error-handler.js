@@ -31,7 +31,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
 
   return res
     .status(customError.statusCode)
-    .json({ message: customError.message });
+    .json({ status: customError.statusCode, message: customError.message });
 };
 
 module.exports = errorHandlerMiddleware;
