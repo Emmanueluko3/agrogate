@@ -6,18 +6,20 @@ import Input from "../../atoms/inputs/input";
 import SocialButton from "../../atoms/buttons/socialButton";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { login } from "../../../store/features/auth/authSlice";
+import { login, loginSuccess } from "../../../store/features/auth/authSlice";
 import apiService from "../../../api/apiService";
 import toast from "react-hot-toast";
 
 interface AuthData {
   name: string;
+  username: string;
   email: string;
   password: string;
 }
 
-interface Errors {
+interface SetFieldsData {
   name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -38,11 +40,13 @@ const Authentication: React.FC = () => {
 
   const [authData, setAuthData] = useState<AuthData>({
     name: "",
+    username: "",
     email: "",
     password: "",
   });
-  const [errors, setErrors] = useState<Errors>({
+  const [errors, setErrors] = useState<AuthData>({
     name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -50,20 +54,26 @@ const Authentication: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
 
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
+  const setFieldsData = (data?: SetFieldsData, error?: SetFieldsData) => {
     setAuthData({
-      name: "",
-      email: "",
-      password: "",
+      name: data?.name || "",
+      username: data?.username || "",
+      email: data?.email || "",
+      password: data?.password || "",
     });
     setErrors({
-      name: "",
-      email: "",
-      password: "",
+      name: error?.name || "",
+      username: error?.username || "",
+      email: error?.email || "",
+      password: error?.password || "",
     });
+  };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/diagnosis");
+    }
+    setFieldsData();
   }, [location, user]);
 
   const isValidEmail = (value: string) => {
@@ -75,7 +85,7 @@ const Authentication: React.FC = () => {
     const { name, value } = e.target;
     setAuthData({
       ...authData,
-      [name]: value,
+      [name]: name == "username" ? value.replace(/\s/g, "") : value,
     });
 
     if (value.trim() === "") {
@@ -104,11 +114,11 @@ const Authentication: React.FC = () => {
     const credentials = authData;
 
     let hasErrors = false;
-    const newErrors: Partial<Errors> = {};
-    Object.keys(authData).forEach((key) => {
+    const newErrors: Partial<AuthData> = {};
+    ["email", "password"].forEach((key) => {
       const value = authData[key as keyof AuthData];
       if (value.trim() === "") {
-        newErrors[key as keyof Errors] = `${key} is required`;
+        newErrors[key as keyof AuthData] = `${key} is required`;
         hasErrors = true;
       } else if (key === "email" && !isValidEmail(value)) {
         newErrors.email = "Invalid email address";
@@ -116,7 +126,7 @@ const Authentication: React.FC = () => {
       }
     });
     if (hasErrors) {
-      setErrors(newErrors as Errors);
+      setErrors(newErrors as AuthData);
       return;
     } else {
       try {
@@ -134,11 +144,11 @@ const Authentication: React.FC = () => {
     event.preventDefault();
 
     let hasErrors = false;
-    const newErrors: Partial<Errors> = {};
+    const newErrors: Partial<AuthData> = {};
     Object.keys(authData).forEach((key) => {
       const value = authData[key as keyof AuthData];
       if (value.trim() === "") {
-        newErrors[key as keyof Errors] = `${key} is required`;
+        newErrors[key as keyof AuthData] = `${key} is required`;
         hasErrors = true;
       } else if (key === "email" && !isValidEmail(value)) {
         newErrors.email = "Invalid email address";
@@ -146,30 +156,20 @@ const Authentication: React.FC = () => {
       }
     });
     if (hasErrors) {
-      setErrors(newErrors as Errors);
+      setErrors(newErrors as AuthData);
       return;
     } else {
       try {
         setIsAuthLoading(true);
         const response: any = await apiService(
-          "/api/v1/accounts/register",
+          "/api/v1/auth/register",
           "POST",
           authData
         );
-        if (response.code || response.data.data) {
-          await dispatch(login(authData));
-          setAuthData({
-            name: "",
-            email: "",
-            password: "",
-          });
-          setErrors({
-            name: "",
-            email: "",
-            password: "",
-          });
-
-          // dispatch(loginSuccess(response.data.data));
+        if (response.data) {
+          await dispatch(loginSuccess(response.data));
+          toast.success(response.data.message);
+          setFieldsData();
         }
       } catch (error: any) {
         if (error?.response) {
@@ -189,7 +189,9 @@ const Authentication: React.FC = () => {
         <h3 className="text-primary-700 text-2xl font-bold">AgroGate</h3>
       </div>
 
-      <div className="md:bg-[#fff] lg:px-7 lg:py-8 p-4 rounded-xl w-full lg:w-2/5 md:w-3/5 mb-24">
+      <div
+        className={`md:bg-[#fff] lg:px-7 lg:py-8 p-4 rounded-xl w-full md:w-3/5 mb-24 ${hasAccount ? "lg:w-2/5" : "lg:w-3/5"}`}
+      >
         <h3 className="text-xl font-bold mb-2 text-primary-600">
           {hasAccount ? "Welcome Back" : "Sign Up"}
         </h3>
@@ -204,23 +206,49 @@ const Authentication: React.FC = () => {
               ? (event) => handleSignin(event)
               : (event) => handleSignup(event)
           }
+          className={
+            hasAccount
+              ? ""
+              : "lg:grid md:grid grid-flow-row lg:grid-cols-2 md:grid-cols-2 gap-4"
+          }
         >
           {!hasAccount && (
-            <div className="mb-5 w-full">
-              <Input
-                label="Name"
-                id="name"
-                name="name"
-                type="text"
-                value={authData.name}
-                onChange={handleChange}
-                disabled={isLoading}
-                placeholder="Emmanuel Stephen"
-              />
-              {errors.name && (
-                <p className="text-xs text-red-600 mt-1 h-1">{errors.name}</p>
-              )}
-            </div>
+            <>
+              <div className="mb-5 w-full">
+                <Input
+                  label="Name"
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="false"
+                  value={authData.name}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  placeholder="Emmanuel Stephen"
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-600 mt-1 h-1">{errors.name}</p>
+                )}
+              </div>{" "}
+              <div className="mb-5 w-full">
+                <Input
+                  label="Username"
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="false"
+                  value={authData.username}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  placeholder="emmanuelsteve"
+                />
+                {errors.username && (
+                  <p className="text-xs text-red-600 mt-1 h-1">
+                    {errors.username}
+                  </p>
+                )}
+              </div>
+            </>
           )}
           <div className="mb-5 w-full">
             <Input
@@ -242,6 +270,7 @@ const Authentication: React.FC = () => {
               label="Password"
               id="password"
               type="password"
+              name="password"
               value={authData.password}
               onChange={handleChange}
               disabled={isLoading}
@@ -253,7 +282,7 @@ const Authentication: React.FC = () => {
             )}
           </div>
           {hasAccount ? (
-            <div className="mb-6 w-full flex justify-between">
+            <div className="mb-6 w-full flex justify-between col-span-2">
               <div className="flex items-center">
                 <Input className="mr-3" type="checkbox" />
                 <span className=" text-base text-primary-450 whitespace-nowrap font-medium">
@@ -265,7 +294,7 @@ const Authentication: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="mb-6 w-full flex">
+            <div className="mb-6 w-full flex col-span-2">
               <div className="mr-3 w-4 h-4 flex">
                 <Input type="checkbox" />
               </div>
@@ -284,7 +313,7 @@ const Authentication: React.FC = () => {
           )}
 
           <Button
-            className="text-white"
+            className="text-white col-span-2"
             type="submit"
             isLoading={isLoading}
             disabled={isLoading}

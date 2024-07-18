@@ -24,11 +24,11 @@ export const login: any = createAsyncThunk(
   async (credentials: LoginCredentials, thunkAPI) => {
     try {
       const response: any = await apiService(
-        "/api/v1/accounts/login",
+        "/api/v1/auth/login",
         "POST",
         credentials
       );
-      const data = response.data.data;
+      const data = response.data;
       toast.success("Welcome");
       return data;
     } catch (error: any) {
@@ -59,21 +59,10 @@ const authSlice = createSlice({
       state.user = undefined;
       window.location.reload();
     },
-    updateCreatorStatus(state, action) {
-      return {
-        ...state,
-        user: {
-          ...state.user,
-          creator_status: action.payload,
-        },
-      };
-    },
   },
   extraReducers: (builder) => {
     builder
-      // .addCase(login.pending, (state) => {
-      //   state.isLoading = true;
-      // })
+
       .addCase(login.fulfilled, (state, action) => {
         const accessToken = action?.payload?.access_token;
         localStorage.setItem("accessToken", accessToken);
@@ -87,6 +76,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginSuccess, loginFailure, logout, updateCreatorStatus } =
-  authSlice.actions;
+export const { loginSuccess, loginFailure, logout } = authSlice.actions;
 export default authSlice.reducer;

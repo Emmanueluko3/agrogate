@@ -5,7 +5,7 @@ const getAccessToken = () => {
 };
 
 export const globalAxios = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL || "http://localhost:5000",
+  baseURL: process.env.REACT_APP_BASE_URL || "http://localhost:4001",
   headers: {
     "X-API-Key": process.env.REACT_APP_API_KEY,
     "Content-Type": "application/json",
@@ -26,5 +26,5 @@ globalAxios.interceptors.response.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );

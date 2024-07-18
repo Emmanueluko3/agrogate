@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const app = express();
 const server = http.createServer(app);
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 const connectDB = require("./config/dbConnect");
 const errorHandlerMiddleware = require("./middlewares/error-handler");
 const authRouter = require("./routes/auth.route");
@@ -17,6 +19,8 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
+
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
   console.log("Home route requested");

@@ -1,6 +1,6 @@
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import React from "react";
-// import { useAppSelector } from "../store/hooks";
+import { useAppSelector } from "../store/hooks";
 
 interface ProtectedRouteProps {
   redirectPath?: string;
@@ -8,14 +8,14 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  // redirectPath = "/signin",
+  redirectPath = "/signin",
   children,
 }) => {
-  // const user = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector((state) => state.auth.user);
 
-  // if (!user) {
-  //   return <Navigate to={redirectPath} replace />;
-  // }
+  if (!user) {
+    return <Navigate to={redirectPath} replace />;
+  }
 
   return children || <Outlet />;
 };
