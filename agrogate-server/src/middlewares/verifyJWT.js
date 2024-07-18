@@ -1,8 +1,9 @@
 const User = require("../models/user.model");
 const { UnauthorizedError } = require("../errors");
 const decodeToken = require("../utils/decodeToken");
+const asyncErrorHandler = require("../utils/asyncErrorHandler");
 
-const verifyJWT = async (req, res, next) => {
+const verifyJWT = asyncErrorHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
@@ -23,6 +24,6 @@ const verifyJWT = async (req, res, next) => {
   }
 
   return res.status(403).send("Bad Access Token");
-};
+});
 
 module.exports = verifyJWT;

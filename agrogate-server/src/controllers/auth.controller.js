@@ -24,13 +24,15 @@ const registerUserController = asyncErrorHandler(async (req, res) => {
   const foundUser = await User.findOne({ username: result.data.username });
 
   if (foundUser) {
-    throw new BadRequestError("User already exists");
+    throw new BadRequestError(
+      `User with username ${result.data.username} already exists`
+    );
   }
 
   // Hash the password
   const hashedPassword = await bcrypt.hash(result.data.password, 10);
 
-  const user = await User.create({
+  const createdUser = await User.create({
     name: result.data.name,
     username: result.data.username,
     email: result.data.email,
@@ -38,8 +40,7 @@ const registerUserController = asyncErrorHandler(async (req, res) => {
     role: role,
   });
 
-  const userObj = user.toObject();
-  delete userObj.password;
+  const { password, ...user } = createdUser.toObject();
 
   const authToken = jwt.sign(
     { username: user.username, id: user.id },
@@ -49,7 +50,7 @@ const registerUserController = asyncErrorHandler(async (req, res) => {
 
   return res.status(StatusCodes.CREATED).json({
     token: authToken,
-    userObj,
+    data: user,
     message: "Your account has been successfully created.",
   });
 });
@@ -65,30 +66,41 @@ const loginUserController = asyncErrorHandler(async (req, res) => {
 
   const foundUser = await User.findOne({
     email: result.data.email,
-  });
+  }).select("+password");
 
-  if (!foundUser) {
-    throw new BadRequestError("Invalid login credentials");
-  }
+  if (!foundUser) throw new BadRequestError("Invalid login credentials");
 
-  if (foundUser) {
+  // validate password
+  const isPasswordValid = await bcrypt.compare(
+    `${result.data.password}`,
+    foundUser.password
+  );
+
+  if (!isPasswordValid)
+    throw new UnauthorizedError(
+      "Invalid email or password. Please try again with the correct credentials."
+    );
+
+  const { password, ...user } = foundUser.toObject();
+
+  if (user) {
     const COOKIE_MAX_AGE = 24 * 60 * 60 * 1000;
     const ACCESS_TOKEN_EXPIRATION = 60 * 60 * 1000;
 
     const accessToken = jwt.sign(
-      { username: foundUser.username, id: foundUser.id },
+      { username: user.username, id: user.id },
       process.env.JWT_SECRET,
       { expiresIn: ACCESS_TOKEN_EXPIRATION }
     );
     const newRefreshToken = jwt.sign(
-      { username: foundUser.username },
+      { username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
     let newRefreshTokenArray = !cookie?.jwt
-      ? foundUser.refreshToken
-      : foundUser.refreshToken.filter((token) => token !== cookie?.jwt);
+      ? user.refreshToken
+      : user.refreshToken.filter((token) => token !== cookie?.jwt);
 
     if (cookie?.jwt) {
       res.clearCookie("jwt", {
@@ -105,7 +117,7 @@ const loginUserController = asyncErrorHandler(async (req, res) => {
       }
     }
 
-    foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+    user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
 
     res.cookie("jwt", newRefreshToken, {
       httpOnly: true,
@@ -116,7 +128,8 @@ const loginUserController = asyncErrorHandler(async (req, res) => {
     return res.status(StatusCodes.OK).json({
       token: accessToken,
       expiresIn: ACCESS_TOKEN_EXPIRATION,
-      user: foundUser,
+      data: user,
+      message: "Login successful",
     });
   }
 });
