@@ -3,11 +3,9 @@ import React from "react";
 import { useAppSelector } from "../../../store/hooks";
 
 const WeatherSoilComp: React.FC = () => {
-  const userProfile: any = useAppSelector(
-    (state) => state.userProfile.userProfile
-  );
+  const profile: any = useAppSelector((state) => state.profile.profile);
   //   const dispatch = useAppDispatch();
-  console.log(userProfile);
+  console.log(profile);
 
   return (
     <div className="bg-[#fff] lg:p-6 p-4 rounded-lg lg:mb-6 mb-4 w-full">

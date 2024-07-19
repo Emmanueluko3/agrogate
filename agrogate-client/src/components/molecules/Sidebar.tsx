@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
 import { logout } from "../../store/features/auth/authSlice";
 import { LogOutIcon } from "../atoms/Icons/Icons";
-import { removeUserProfile } from "../../store/features/user/userprofileSlice";
+import { removeProfile } from "../../store/features/user/profileSlice";
 import Button from "../atoms/buttons/button";
 
 import ModalComponent from "./Modals/Modal";
@@ -31,7 +31,7 @@ const Sidebar: React.FC = () => {
 
   const handleSignOut = async () => {
     dispatch(logout());
-    dispatch(removeUserProfile({ user: undefined }));
+    dispatch(removeProfile({ user: undefined }));
   };
 
   const [logoutState, setLogoutState] = useState(false);
@@ -102,7 +102,7 @@ export const Footerbar: React.FC = () => {
 
   const handleSignOut = async () => {
     dispatch(logout());
-    dispatch(removeUserProfile({ user: undefined }));
+    dispatch(removeProfile({ user: undefined }));
   };
 
   const [logoutState, setLogoutState] = useState(false);

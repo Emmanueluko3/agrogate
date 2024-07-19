@@ -6,11 +6,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 const Diagnose: React.FC = () => {
-  const userProfile: any = useAppSelector(
-    (state) => state.userProfile.userProfile
-  );
+  const profile: any = useAppSelector((state) => state.profile.profile);
   //   const dispatch = useAppDispatch();
-  console.log(userProfile);
+  console.log(profile);
 
   // ai reports
   const [messageInput, setMessageInput] = useState("");

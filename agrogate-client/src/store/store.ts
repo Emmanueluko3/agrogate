@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/auth/authSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer } from "redux-persist";
-import userprofileSlice from "./features/user/userprofileSlice";
+import profileSlice from "./features/user/profileSlice";
 import settingsSlice from "./features/user/settingsSlice";
 
 const persistConfiig = {
@@ -13,7 +13,7 @@ const persistConfiig = {
 
 const reducer = combineReducers({
   auth: authReducer,
-  userProfile: userprofileSlice,
+  profile: profileSlice,
   settings: settingsSlice,
 });
 

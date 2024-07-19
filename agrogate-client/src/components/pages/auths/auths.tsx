@@ -111,7 +111,8 @@ const Authentication: React.FC = () => {
   const handleSignin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const credentials = authData;
+    const { name, username, ...credentials } = authData;
+    console.log(name, username);
 
     let hasErrors = false;
     const newErrors: Partial<AuthData> = {};

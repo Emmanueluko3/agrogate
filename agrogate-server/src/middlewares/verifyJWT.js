@@ -7,7 +7,7 @@ const verifyJWT = asyncErrorHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
-    throw new UnauthorizedError("Invalid access token");
+    throw new UnauthorizedError("Invalid access token, authorization denied");
   }
   const accessToken = authHeader.split(" ")[1];
 
@@ -18,12 +18,12 @@ const verifyJWT = asyncErrorHandler(async (req, res, next) => {
   if (verifyToken) {
     const user = await User.findOne({ username: verifyToken.username });
     req.user = user;
-    req.id = user.id;
+    req.id = user._id;
 
     return next();
   }
 
-  return res.status(403).send("Bad Access Token");
+  return res.status(403).json("Bad Access Token");
 });
 
 module.exports = verifyJWT;

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 const { Schema } = mongoose;
 
 const userSchema = new Schema(
@@ -32,10 +32,38 @@ const userSchema = new Schema(
       max: 25,
       type: String,
     },
+    profile_image: {
+      type: String,
+    },
+    cover_image: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    bio: {
+      type: String,
+      max: 500,
+    },
+
     refreshToken: [String],
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    toObject: {
+      transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
   }
 );
 

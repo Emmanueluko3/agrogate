@@ -7,11 +7,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
 
 const Community: React.FC = () => {
-  const userProfile: any = useAppSelector(
-    (state) => state.userProfile.userProfile
-  );
+  const profile: any = useAppSelector((state) => state.profile.profile);
   //   const dispatch = useAppDispatch();
-  console.log(userProfile);
+  console.log(profile);
 
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-6">

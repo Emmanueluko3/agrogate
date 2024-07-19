@@ -6,11 +6,9 @@ import FarmBg from "../../../assets/images/farmBg.jpg";
 import FarmBg1 from "../../../assets/images/farmBg1.jpg";
 
 const Marketplace: React.FC = () => {
-  const userProfile: any = useAppSelector(
-    (state) => state.userProfile.userProfile
-  );
+  const profile: any = useAppSelector((state) => state.profile.profile);
   //   const dispatch = useAppDispatch();
-  console.log(userProfile);
+  console.log(profile);
 
   const products = [
     { image: FarmBg, title: "Potato", price: 2000 },

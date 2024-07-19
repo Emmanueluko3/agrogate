@@ -5,7 +5,7 @@ import Button from "../../atoms/buttons/button";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import Input from "../../atoms/inputs/input";
 import { globalAxios } from "../../../api/globalAxios";
-import { fetchUserProfile } from "../../../store/features/user/userprofileSlice";
+import { fetchProfile } from "../../../store/features/user/profileSlice";
 import toast from "react-hot-toast";
 import ConfirmModal from "../../molecules/Modals/ConfirmModal";
 import CoverPhoto from "../../../assets/images/farmBg.jpg";
@@ -14,8 +14,8 @@ interface ProfileDataProps {
   name: string;
   username: string;
   bio: string;
-  profileImage: string;
-  coverImage: string;
+  profile_image: string;
+  cover_image: string;
   socials: {
     social_media_type: string;
     url: string;
@@ -23,20 +23,18 @@ interface ProfileDataProps {
 }
 
 const ProfileDetails: React.FC = () => {
-  const userProfile: any = useAppSelector(
-    (state) => state.userProfile.userProfile
-  );
+  const profile: any = useAppSelector((state) => state.profile.profile);
   const dispatch = useAppDispatch();
 
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const coverImageInputRef = useRef<HTMLInputElement>(null);
+  const cover_imageInputRef = useRef<HTMLInputElement>(null);
 
   const [profileData, setProfileData] = useState<ProfileDataProps>({
     name: "",
     username: "",
     bio: "",
-    profileImage: "",
-    coverImage: "",
+    profile_image: "",
+    cover_image: "",
     socials: [
       { social_media_type: "TWITTER", url: "" },
       { social_media_type: "FACEBOOK", url: "" },
@@ -51,46 +49,41 @@ const ProfileDetails: React.FC = () => {
   const [disableInput, setDisableInput] = useState<boolean>(false);
   const [updateModalState, setUpdateModalState] = useState<boolean>(false);
 
-  const setUserProfileData = () => {
+  const setprofileData = () => {
     setProfileData((prevProfileData) => ({
       ...prevProfileData,
-      name: userProfile?.name || "",
-      username: userProfile?.creator_username || "",
-      bio: userProfile?.bio || "",
-      profileImage: userProfile?.image || "",
-      coverImage: userProfile?.cover_photo || "",
-      socials: prevProfileData.socials.map((social) => ({
-        ...social,
-        url:
-          userProfile?.social_media.find(
-            (item: any) => item.social_media_type === social.social_media_type
-          )?.url || social.url,
-      })),
+      name: profile?.name || "",
+      username: profile?.username || "",
+      bio: profile?.bio || "",
+      profile_image: profile?.profile_image || "",
+      cover_image: profile?.cover_image || "",
     }));
   };
 
   // Setting user inputs when mounted or successful profile update
   useEffect(() => {
-    setUserProfileData();
-  }, [userProfile]);
+    setprofileData();
+  }, [profile]);
 
   const handleUpdateProfile = async () => {
     setIsLoading(true);
     setDisableInput(true);
     setUpdateModalState(false);
     try {
-      const { profileImage, coverImage, name, username, bio, socials } =
+      const { profile_image, cover_image, name, username, bio, socials } =
         profileData;
-      const profileImageBlob = await fetch(profileImage).then((res) =>
+      const profile_imageBlob = await fetch(profile_image).then((res) =>
         res.blob()
       );
-      const coverImageBlob = await fetch(coverImage).then((res) => res.blob());
+      const cover_imageBlob = await fetch(cover_image).then((res) =>
+        res.blob()
+      );
       const formData = new FormData();
       formData.append("name", name);
       formData.append("userName", username);
       formData.append("bio", bio);
-      formData.append("image", profileImageBlob);
-      formData.append("coverPhoto", coverImageBlob);
+      formData.append("image", profile_imageBlob);
+      formData.append("coverPhoto", cover_imageBlob);
 
       socials.forEach((social, index) => {
         formData.append(
@@ -101,7 +94,7 @@ const ProfileDetails: React.FC = () => {
       });
 
       const response: any = await globalAxios.patch(
-        "/api/v1/creators/profile",
+        "/api/v1/profile",
         formData,
         {
           headers: {
@@ -115,7 +108,7 @@ const ProfileDetails: React.FC = () => {
         toast.success("Congratulations! 🎉 Your profile setup is successful.");
         setIsLoading(false);
         setDisableInput(false);
-        dispatch(fetchUserProfile());
+        dispatch(fetchProfile());
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.message);
@@ -173,23 +166,23 @@ const ProfileDetails: React.FC = () => {
       {/* Profile Pictures */}
       <div className="rounded-lg bg-slate-500 lg:h-52 h-28 relative lg:mb-20 mb-14">
         <img
-          src={profileData?.coverImage ? profileData?.coverImage : CoverPhoto}
+          src={profileData?.cover_image ? profileData?.cover_image : CoverPhoto}
           alt=""
-          onClick={() => coverImageInputRef?.current?.click()}
+          onClick={() => cover_imageInputRef?.current?.click()}
           className="h-full w-full rounded-lg cursor-pointer"
         />
         <input
           type="file"
           className="hidden"
-          name="coverImage"
-          ref={coverImageInputRef}
+          name="cover_image"
+          ref={cover_imageInputRef}
           disabled={disableInput}
           onChange={handleInputChange}
         />
         <div className="lg:w-24 lg:h-24 h-20 w-20 rounded-full bg-white flex justify-center items-center absolute lg:-bottom-1/4 -bottom-1/3 left-1/2 transform -translate-x-1/2">
-          {profileData?.profileImage ? (
+          {profileData?.profile_image ? (
             <img
-              src={profileData?.profileImage}
+              src={profileData?.profile_image}
               alt=""
               className="cursor-pointer rounded-full w-[90%] h-[90%]"
               onClick={() => imageInputRef?.current?.click()}
@@ -200,7 +193,7 @@ const ProfileDetails: React.FC = () => {
           <input
             type="file"
             className="hidden"
-            name="profileImage"
+            name="profile_image"
             ref={imageInputRef}
             disabled={disableInput}
             onChange={handleInputChange}
