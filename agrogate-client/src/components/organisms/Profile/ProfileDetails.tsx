@@ -14,12 +14,9 @@ interface ProfileDataProps {
   name: string;
   username: string;
   bio: string;
+  country: string;
   profile_image: string;
   cover_image: string;
-  socials: {
-    social_media_type: string;
-    url: string;
-  }[];
 }
 
 const ProfileDetails: React.FC = () => {
@@ -33,16 +30,9 @@ const ProfileDetails: React.FC = () => {
     name: "",
     username: "",
     bio: "",
+    country: "",
     profile_image: "",
     cover_image: "",
-    socials: [
-      { social_media_type: "TWITTER", url: "" },
-      { social_media_type: "FACEBOOK", url: "" },
-      { social_media_type: "INSTAGRAM", url: "" },
-      { social_media_type: "LINKEDIN", url: "" },
-      { social_media_type: "YOUTUBE", url: "" },
-      { social_media_type: "TIKTOK", url: "" },
-    ],
   });
   const maxBioLength = 250;
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -55,6 +45,7 @@ const ProfileDetails: React.FC = () => {
       name: profile?.name || "",
       username: profile?.username || "",
       bio: profile?.bio || "",
+      country: profile?.country || "",
       profile_image: profile?.profile_image || "",
       cover_image: profile?.cover_image || "",
     }));
@@ -70,8 +61,7 @@ const ProfileDetails: React.FC = () => {
     setDisableInput(true);
     setUpdateModalState(false);
     try {
-      const { profile_image, cover_image, name, username, bio, socials } =
-        profileData;
+      const { profile_image, cover_image, name, username, bio } = profileData;
       const profile_imageBlob = await fetch(profile_image).then((res) =>
         res.blob()
       );
@@ -84,14 +74,6 @@ const ProfileDetails: React.FC = () => {
       formData.append("bio", bio);
       formData.append("image", profile_imageBlob);
       formData.append("coverPhoto", cover_imageBlob);
-
-      socials.forEach((social, index) => {
-        formData.append(
-          `socials[${index}].SocialMediaType`,
-          social.social_media_type
-        );
-        formData.append(`socials[${index}].Url`, social.url);
-      });
 
       const response: any = await globalAxios.patch(
         "/api/v1/profile",
@@ -140,22 +122,6 @@ const ProfileDetails: React.FC = () => {
     }
   };
 
-  const handleSocialInputChange = (
-    index: number,
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const { value } = event.target;
-    const updatedsocials = [...profileData.socials];
-    updatedsocials[index] = {
-      ...updatedsocials[index],
-      url: value,
-    };
-    setProfileData((prevProfileData) => ({
-      ...prevProfileData,
-      socials: updatedsocials,
-    }));
-  };
-
   return (
     <div className="bg-[#fff] lg:p-6 p-4 rounded-lg lg:mb-6 mb-4 w-full">
       <div className="flex justify-between items-start mb-4">
@@ -201,12 +167,11 @@ const ProfileDetails: React.FC = () => {
         </div>
       </div>
       {/* Profile Forms */}
-      <div>
-        {/* Personal Data */}
+      <div className="grid grid-flow-row grid-cols-5 gap-4">
+        <div className="col-span-2">
+          {/* Personal Data */}
 
-        {/* Social links */}
-        <div className="grid grid-flow-row lg:grid-cols-2 grid-cols-1 lg:gap-6 gap-4 lg:mb-6 mb-4">
-          <div className="col-span-1">
+          <div className="lg:mb-4 mb-2">
             <Input
               label="Name"
               name="name"
@@ -218,7 +183,7 @@ const ProfileDetails: React.FC = () => {
               disabled={disableInput}
             />
           </div>
-          <div className="col-span-1">
+          <div className="lg:mb-4 mb-2">
             <Input
               type="text"
               label="Username"
@@ -230,51 +195,41 @@ const ProfileDetails: React.FC = () => {
               disabled={disableInput}
             />
           </div>
-          {profileData.socials.map((social, index) => (
-            <div className="col-span-1" key={index}>
-              <Input
-                label={`${social.social_media_type.toLowerCase().replace(/^./, social.social_media_type[0].toUpperCase())} Account`}
-                onChange={(e) => handleSocialInputChange(index, e)}
-                type="text"
-                name={social.social_media_type}
-                value={social.url}
-                placeholder={`Enter ${social.social_media_type.toLowerCase().replace(/^./, social.social_media_type[0].toUpperCase())} url`}
-                disabled={disableInput}
-              />
-            </div>
-          ))}
-        </div>
-        {/* Bio */}
-        <div className="lg:mb-6 mb-4 w-full">
-          <p className="text-base text-gray-950 mb-1.5 font-medium">Bio</p>
-          <textarea
-            maxLength={maxBioLength}
-            value={profileData?.bio}
-            name="bio"
-            disabled={disableInput}
-            onChange={handleInputChange}
-            placeholder="Tell us about yourself"
-            className="border h-32 w-full border-gray-300 bg-[#F9F9FB] rounded-lg py-2 px-4 focus:outline-none focus:border-primaryColor resize-none"
-          ></textarea>
-          {!disableInput && (
-            <p className="text-sm text-customDarkGray">
-              {profileData?.bio?.length <= 0
-                ? `Enter up to ${maxBioLength} character`
-                : `${maxBioLength - profileData?.bio?.length} characters left`}
-            </p>
-          )}
-        </div>
 
-        <div className="grid grid-flow-row grid-cols-2 lg:gap-6 gap-4 lg:mb-6 mb-4">
-          <div className="col-span-1">
-            <Button
-              type="button"
-              className=" text-gray-900 bg-transparent border border-primary-400 hover:bg-primary-400 hover:text-white whitespace-nowrap lg:text-lg text-sm"
-            >
-              Cancel
-            </Button>
+          <div className="lg:mb-4 mb-2">
+            <Input
+              type="text"
+              label="Country"
+              name="country"
+              value={profileData?.country.trim()}
+              onChange={handleInputChange}
+              placeholder={profileData?.country}
+              disabled={disableInput}
+            />
           </div>
-          <div className="col-span-1">
+
+          {/* Bio */}
+          <div className="lg:mb-6 mb-4 w-full">
+            <p className="text-base text-gray-950 mb-1.5 font-medium">Bio</p>
+            <textarea
+              maxLength={maxBioLength}
+              value={profileData?.bio}
+              name="bio"
+              disabled={disableInput}
+              onChange={handleInputChange}
+              placeholder="Tell us about yourself"
+              className="border h-24 w-full border-gray-300 bg-[#F9F9FB] rounded-lg py-2 px-4 focus:outline-none focus:border-primaryColor resize-none"
+            ></textarea>
+            {!disableInput && (
+              <p className="text-sm text-customDarkGray">
+                {profileData?.bio?.length <= 0
+                  ? `Enter up to ${maxBioLength} character`
+                  : `${maxBioLength - profileData?.bio?.length} characters left`}
+              </p>
+            )}
+          </div>
+
+          <div className="lg:mb-6 mb-4">
             <Button
               onClick={() => setUpdateModalState(true)}
               isLoading={isLoading}
@@ -285,6 +240,7 @@ const ProfileDetails: React.FC = () => {
             </Button>
           </div>
         </div>
+        <div className="col-span-3">Posts</div>
       </div>
       <ConfirmModal
         title="Confirm"
