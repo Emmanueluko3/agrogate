@@ -10,7 +10,7 @@ const Community: React.FC = () => {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log(isLoading, posts);
+  console.log(isLoading);
 
   const fetchPosts = async () => {
     try {

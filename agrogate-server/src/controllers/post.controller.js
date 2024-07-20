@@ -46,29 +46,62 @@ const updatePostController = asyncErrorHandler(async (req, res) => {
     .json({ status: StatusCodes.OK, message: "Successful", post });
 });
 
-const likePostController = asyncErrorHandler(async (req, res) => {
-  const userId = req.id;
+const likePostController = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+    if (!post) return res.status(404).json({ error: "Post not found" });
 
-  const data = await User.findOne({ _id: userId });
+    if (!post.likes.includes(req.user.id)) {
+      post.likes.push(req.user.id);
+    } else {
+      post.likes = post.likes.filter(
+        (userId) => userId.toString() !== req.user.id
+      );
+    }
 
-  if (!data) throw new NotFound("No user found with this id");
+    await post.save();
+    res.json(post);
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+};
 
-  return res
-    .status(StatusCodes.OK)
-    .json({ status: StatusCodes.OK, message: "Successful", data });
-});
+// Add a comment to a post
+const addCommentController = async (req, res) => {
+  try {
+    const { text } = req.body;
+    const post = await Post.findById(req.params.postId);
+    if (!post) return res.status(404).json({ error: "Post not found" });
 
-const addPostCommentController = asyncErrorHandler(async (req, res) => {
-  const userId = req.id;
+    const newComment = new Comment({ user: req.user.id, text });
+    post.comments.push(newComment);
+    await post.save();
 
-  const data = await User.findOne({ _id: userId });
+    res.status(201).json(newComment);
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+};
 
-  if (!data) throw new NotFound("No user found with this id");
+// Reply to a comment
+const replyToCommentController = async (req, res) => {
+  try {
+    const { text } = req.body;
+    const post = await Post.findById(req.params.postId);
+    if (!post) return res.status(404).json({ error: "Post not found" });
 
-  return res
-    .status(StatusCodes.OK)
-    .json({ status: StatusCodes.OK, message: "Successful", data });
-});
+    const comment = post.comments.id(req.params.commentId);
+    if (!comment) return res.status(404).json({ error: "Comment not found" });
+
+    const newReply = new Comment({ user: req.user.id, text });
+    comment.replies.push(newReply);
+    await post.save();
+
+    res.status(201).json(newReply);
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+};
 
 const getPostController = asyncErrorHandler(async (req, res) => {
   const userId = req.id;
@@ -106,7 +139,7 @@ module.exports = {
   createPostController,
   updatePostController,
   likePostController,
-  addPostCommentController,
+  addCommentController,
   getPostController,
   getAllPostsController,
 };

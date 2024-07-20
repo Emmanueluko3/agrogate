@@ -17,13 +17,6 @@ interface AuthData {
   password: string;
 }
 
-interface SetFieldsData {
-  name: string;
-  username: string;
-  email: string;
-  password: string;
-}
-
 const Authentication: React.FC = () => {
   // Pathnames
   const location = useLocation();
@@ -54,7 +47,7 @@ const Authentication: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
 
-  const setFieldsData = (data?: SetFieldsData, error?: SetFieldsData) => {
+  const setFieldsData = (data?: AuthData, error?: AuthData) => {
     setAuthData({
       name: data?.name || "",
       username: data?.username || "",
