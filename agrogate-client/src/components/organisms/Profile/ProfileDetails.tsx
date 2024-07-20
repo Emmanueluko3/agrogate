@@ -9,6 +9,8 @@ import { fetchProfile } from "../../../store/features/user/profileSlice";
 import toast from "react-hot-toast";
 import ConfirmModal from "../../molecules/Modals/ConfirmModal";
 import CoverPhoto from "../../../assets/images/farmBg.jpg";
+import apiService from "../../../api/apiService";
+import PostCard from "../../molecules/Cards/postCard";
 
 interface ProfileDataProps {
   name: string;
@@ -54,6 +56,7 @@ const ProfileDetails: React.FC = () => {
   // Setting user inputs when mounted or successful profile update
   useEffect(() => {
     setprofileData();
+    fetchPosts();
   }, [profile]);
 
   const handleUpdateProfile = async () => {
@@ -122,11 +125,32 @@ const ProfileDetails: React.FC = () => {
     }
   };
 
+  const [posts, setPosts] = useState([]);
+  const fetchPosts = async () => {
+    try {
+      const response: any = await apiService("/api/v1/posts/me", "GET");
+      if (response.data) {
+        const data = response.data;
+        setPosts(data.data);
+      }
+    } catch (error: any) {
+      console.log("error message", error);
+    }
+  };
+
+  const userPost = (
+    <div className="flex flex-col">
+      {posts.map((item: any, index) => (
+        <PostCard key={index} data={item} />
+      ))}
+    </div>
+  );
+
   return (
     <div className="bg-[#fff] lg:p-6 p-4 rounded-lg lg:mb-6 mb-4 w-full">
       <div className="flex justify-between items-start mb-4">
         <h2 className="lg:text-xl text-lg lg:mb-6 mb-4 font-semibold text-gray-900">
-          Edit Profile
+          Profile
         </h2>
       </div>
       {/* Profile Pictures */}
@@ -145,12 +169,12 @@ const ProfileDetails: React.FC = () => {
           disabled={disableInput}
           onChange={handleInputChange}
         />
-        <div className="lg:w-24 lg:h-24 h-20 w-20 rounded-full bg-white flex justify-center items-center absolute lg:-bottom-1/4 -bottom-1/3 left-1/2 transform -translate-x-1/2">
+        <div className="lg:w-56 lg:h-56 h-20 w-20 rounded-2xl bg-white flex justify-center items-center absolute lg:-bottom-1/4 -bottom-1/3 left-1/2 md:left-20 transform -translate-x-1/2 md:-translate-x-0">
           {profileData?.profile_image ? (
             <img
               src={profileData?.profile_image}
               alt=""
-              className="cursor-pointer rounded-full w-[90%] h-[90%]"
+              className="cursor-pointer rounded-2xl w-[95%] h-[95%]"
               onClick={() => imageInputRef?.current?.click()}
             />
           ) : (
@@ -168,7 +192,10 @@ const ProfileDetails: React.FC = () => {
       </div>
       {/* Profile Forms */}
       <div className="grid grid-flow-row grid-cols-5 gap-4">
-        <div className="col-span-2">
+        <div className="col-span-5 md:col-span-3 w-full overflow-y-auto no-scrollbar max-h-[85vh] order-2 md:order-1">
+          <h2 className="font-semibold text-xl mb-6">Posts</h2> {userPost}
+        </div>
+        <div className="col-span-5 md:col-span-2">
           {/* Personal Data */}
 
           <div className="lg:mb-4 mb-2">
@@ -240,7 +267,6 @@ const ProfileDetails: React.FC = () => {
             </Button>
           </div>
         </div>
-        <div className="col-span-3">Posts</div>
       </div>
       <ConfirmModal
         title="Confirm"

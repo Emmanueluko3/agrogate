@@ -115,6 +115,27 @@ const getPostController = asyncErrorHandler(async (req, res) => {
     .json({ status: StatusCodes.OK, message: "Successful", data });
 });
 
+const getPostsByUser = asyncErrorHandler(async (req, res) => {
+  const user = req.id;
+
+  const data = await Post.find({ user })
+    .populate("user", ["name", "profile_image"])
+    .populate({
+      path: "comments.user",
+      select: "name",
+    })
+    .populate({
+      path: "comments.replies",
+      populate: {
+        path: "user",
+        select: "name",
+      },
+    });
+  return res
+    .status(StatusCodes.OK)
+    .json({ status: StatusCodes.OK, message: "Successful", data });
+});
+
 const getAllPostsController = asyncErrorHandler(async (req, res) => {
   const data = await Post.find()
     .populate("user", ["name", "profile_image"])
@@ -141,5 +162,6 @@ module.exports = {
   likePostController,
   addCommentController,
   getPostController,
+  getPostsByUser,
   getAllPostsController,
 };

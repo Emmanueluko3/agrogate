@@ -9,4 +9,11 @@ const createProductSchema = z.object({
     .nonempty("At least one image URL is required"),
 });
 
-module.exports = { createProductSchema };
+const updateProductSchema = z.object({
+  title: z.string().min(1).optional(),
+  price: z.number().positive().optional(),
+  description: z.string().optional(),
+  images: z.array(z.string().url()).optional(),
+});
+
+module.exports = { createProductSchema, updateProductSchema };

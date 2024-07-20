@@ -24,6 +24,16 @@ const userSchema = new Schema(
       unique: true,
       required: [true, "Your email is required"],
     },
+    phone_number: {
+      type: String,
+      required: [true, "Your phone number is required"],
+      validate: {
+        validator: function (v) {
+          return /\d{10,15}/.test(v);
+        },
+        message: (props) => `${props.value} is not a valid phone number!`,
+      },
+    },
     role: String,
     password: {
       type: String,

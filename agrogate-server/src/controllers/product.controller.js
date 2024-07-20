@@ -1,21 +1,83 @@
-const createProduct = async (req, res) => {
-  try {
-    const product = new Product(req.body);
-    await product.save();
-    res.status(201).send(product);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-};
+const { StatusCodes } = require("http-status-codes");
+const Product = require("../models/product.model");
+const asyncErrorHandler = require("../utils/asyncErrorHandler");
+const {
+  createProductSchema,
+  updateProductSchema,
+} = require("../schema/product.schema");
+const { BadRequestError, UnauthorizedError, NotFound } = require("../errors");
+const { fromZodError } = require("zod-validation-error");
 
-// Get all products
-const getAllProducts = async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.status(200).send(products);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
+const createProduct = asyncErrorHandler(async (req, res) => {
+  const user = req.id;
 
-module.exports = { createProduct, getAllProducts };
+  const result = createProductSchema.safeParse(req.body);
+
+  if (!result.success) {
+    throw new BadRequestError(fromZodError(result.error).toString());
+  }
+
+  const product = new Product({ user, ...result.data });
+
+  await product.save();
+  return res
+    .status(StatusCodes.OK)
+    .json({ status: StatusCodes.OK, message: "Successful", product });
+});
+
+const updateProductController = asyncErrorHandler(async (req, res) => {
+  const userId = req.id;
+  const { id } = req.params;
+
+  const result = updateProductSchema.safeParse(req.body);
+  if (!result.success)
+    throw new BadRequestError(fromZodError(result.error).toString());
+
+  const { title, price, description, images } = result.data;
+
+  const product = await Product.findById(id);
+  if (!product) throw new NotFound("Product not found");
+
+  if (product.user._id.toString() !== userId.toString())
+    throw new UnauthorizedError(
+      "You are not authorized to update this product"
+    );
+
+  if (title !== undefined) product.title = title;
+  if (price !== undefined) product.price = price;
+  if (description !== undefined) product.description = description;
+  if (images !== undefined) product.images = images;
+
+  await product.save();
+
+  return res
+    .status(StatusCodes.OK)
+    .json({ status: StatusCodes.OK, message: "Successful", product });
+});
+
+const getProductsByUser = asyncErrorHandler(async (req, res) => {
+  const user = req.id;
+
+  const data = await Product.find({ user });
+  return res
+    .status(StatusCodes.OK)
+    .json({ status: StatusCodes.OK, message: "Successful", data });
+});
+
+const getAllProducts = asyncErrorHandler(async (req, res) => {
+  const data = await Product.find({}).populate("user", [
+    "name",
+    "profile_image",
+    "phone_number",
+  ]);
+  return res
+    .status(StatusCodes.OK)
+    .json({ status: StatusCodes.OK, message: "Successful", data });
+});
+
+module.exports = {
+  createProduct,
+  updateProductController,
+  getProductsByUser,
+  getAllProducts,
+};

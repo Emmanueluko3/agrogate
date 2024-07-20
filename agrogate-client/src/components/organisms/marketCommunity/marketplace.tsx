@@ -1,12 +1,11 @@
-import React, { ChangeEvent, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import Button from "../../atoms/buttons/button";
 import ProductCard from "../../molecules/Cards/productCard";
-import FarmBg from "../../../assets/images/farmBg.jpg";
-import FarmBg1 from "../../../assets/images/farmBg1.jpg";
 import ModalComponent from "../../molecules/Modals/Modal";
 import Input from "../../atoms/inputs/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
+import apiService from "../../../api/apiService";
 
 interface CreateData {
   title: string;
@@ -16,6 +15,8 @@ interface CreateData {
 }
 
 const Marketplace: React.FC = () => {
+  const tabs = ["Explore", "My Listings"];
+  const [tab, setTab] = useState(tabs[0]);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [createModalState, setCreateModalState] = useState(false);
   const [createProductData, setCreateProductData] = useState({
@@ -32,13 +33,25 @@ const Marketplace: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const products = [
-    { image: FarmBg, title: "Potato", price: 2000 },
-    { image: FarmBg1, title: "Rice", price: 2000 },
-    { image: FarmBg, title: "Vegetable", price: 4000 },
-    { image: FarmBg1, title: "Onions", price: 100 },
-    { image: FarmBg1, title: "Garlic", price: 7200 },
-  ];
+  const [products, setProducts] = useState([]);
+  const fetchPosts = async () => {
+    try {
+      const response: any = await apiService(
+        `/api/v1/products${tab == "My Listings" ? "/me" : ""}`,
+        "GET"
+      );
+      if (response.data) {
+        const data = response.data;
+        setProducts(data.data);
+      }
+    } catch (error: any) {
+      console.error("error message", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, [tab]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>
@@ -219,9 +232,17 @@ const Marketplace: React.FC = () => {
     <div className="w-full">
       {createModal}
       <div className="flex items-center justify-between w-full">
-        <h2 className="lg:text-xl text-lg lg:mb-6 mb-4 font-semibold text-gray-900">
-          Most recent Listing
-        </h2>
+        <div className="flex lg:mb-6 mb-4">
+          {tabs.map((item, index) => (
+            <button
+              key={index}
+              onClick={() => setTab(item)}
+              className={`py-1 px-1 lg:mr-8 mr-4 text-xs lg:text-base whitespace-nowrap ${tab == item ? "text-primary-500 border-b-2 border-primary-500 font-medium" : ""}`}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
         <div className="lg:mb-6 mb-4">
           <Button
             onClick={() => setCreateModalState(true)}
@@ -231,15 +252,10 @@ const Marketplace: React.FC = () => {
           </Button>
         </div>
       </div>
-      <div className="w-full grid grid-flow-row grid-cols-2 lg:grid-cols-4 gap-4">
-        {products.map((product, index) => (
-          <ProductCard
-            key={index}
-            id={index}
-            title={product.title}
-            image={product.image}
-            price={product.price}
-          />
+
+      <div className="w-full grid grid-flow-row grid-cols-2 lg:grid-cols-4 gap-4 min-h-[70vh] md:px-6 px-2">
+        {products.map((item, index) => (
+          <ProductCard key={index} data={item} />
         ))}
       </div>
     </div>
