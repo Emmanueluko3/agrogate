@@ -13,6 +13,7 @@ const routeNotFound = require("./middlewares/route-not-found");
 const verifyJWT = require("./middlewares/verifyJWT");
 const authRouter = require("./routes/auth.route");
 const profileRouter = require("./routes/user.route");
+const postRouter = require("./routes/post.route");
 
 connectDB(process.env.MONGODB_URI);
 
@@ -32,6 +33,7 @@ app.use("/api/v1/auth", authRouter);
 
 app.use(verifyJWT);
 app.use("/api/v1/profile", profileRouter);
+app.use("/api/v1/posts", postRouter);
 
 app.use(errorHandlerMiddleware);
 app.use(routeNotFound);
