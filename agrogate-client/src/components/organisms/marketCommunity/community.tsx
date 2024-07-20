@@ -1,15 +1,35 @@
-import React from "react";
-import { useAppSelector } from "../../../store/hooks";
+import React, { useEffect, useState } from "react";
 import User from "../../../assets/images/farmBg1.jpg";
 import PostCard from "../../molecules/Cards/postCard";
 import Button from "../../atoms/buttons/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
+import apiService from "../../../api/apiService";
 
 const Community: React.FC = () => {
-  const profile: any = useAppSelector((state) => state.profile.profile);
-  //   const dispatch = useAppDispatch();
-  console.log(profile);
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  console.log(isLoading, posts);
+
+  const fetchPosts = async () => {
+    try {
+      setIsLoading(true);
+      const response: any = await apiService("/api/v1/posts", "GET");
+      if (response.data) {
+        const data = response.data;
+        setPosts(data.data);
+      }
+    } catch (error: any) {
+      console.log("error message", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-6">
@@ -31,9 +51,9 @@ const Community: React.FC = () => {
           </Button>
         </div>
         <div className="flex flex-col">
-          <PostCard id={1} />
-          <PostCard id={2} />
-          <PostCard id={3} />
+          {posts.map((item: any, index) => (
+            <PostCard key={index} data={item} />
+          ))}
         </div>
       </div>
       <div className="bg-[#fff] rounded-lg lg:mb-6 mb-4 w-full col-span-2 h-fit py-4">

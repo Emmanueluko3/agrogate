@@ -84,7 +84,7 @@ const getPostController = asyncErrorHandler(async (req, res) => {
 
 const getAllPostsController = asyncErrorHandler(async (req, res) => {
   const data = await Post.find()
-    .populate("user", "name")
+    .populate("user", ["name", "profile_image"])
     .populate({
       path: "comments.user",
       select: "name",

@@ -12,18 +12,34 @@ const commentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const postSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: [true, "User is required"],
+const postSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "User is required"],
+    },
+    description: { type: String },
+    media: [{ type: String }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    comments: [commentSchema],
+    createdAt: { type: Date, default: Date.now },
   },
-  description: { type: String },
-  media: [{ type: String }],
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  comments: [commentSchema],
-  createdAt: { type: Date, default: Date.now },
-});
+  {
+    toJSON: {
+      transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+      },
+    },
+    toObject: {
+      transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+      },
+    },
+  }
+);
 
 const Post = mongoose.model("Post", postSchema);
 const Comment = mongoose.model("Comment", commentSchema);

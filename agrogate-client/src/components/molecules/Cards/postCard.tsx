@@ -1,47 +1,69 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import FarmBg1 from "../../../assets/images/farmBg1.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faThumbsUp } from "@fortawesome/free-regular-svg-icons";
 import { faPhone } from "@fortawesome/free-solid-svg-icons";
 
 interface PostCardProps {
-  id: number | string;
-  //   image: string;
-  //   title: string;
-  //   price: number | string;
+  data: {
+    user: any;
+    id: number | string;
+    description: string;
+    media: [string];
+    likes: [string];
+    comments: [string];
+    createdAt: string;
+  };
 }
 
-const PostCard: React.FC<PostCardProps> = ({ id }) => {
+const formatDate = (date: string) => {
+  const today = new Date();
+  const inputDate = new Date(date);
+
+  const isToday = today.toDateString() === inputDate.toDateString();
+
+  if (isToday) {
+    return `Today: ${inputDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  } else {
+    const day = inputDate.getDate();
+    const month = inputDate.getMonth() + 1; // Months are zero-indexed
+    const year = inputDate.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+};
+
+const PostCard: React.FC<PostCardProps> = ({ data }) => {
   return (
     <div className="bg-[#fff] rounded-lg lg:mb-6 mb-4 w-full border border-primary-100">
-      <Link to={`/community/post/${id}`}>
-        {" "}
+      <Link to={`/community/post/${data.id}`}>
         <div className="flex items-center pt-4 px-4">
           <div className="h-10 w-10 rounded-full mr-2">
-            <img src={FarmBg1} alt="" className="rounded-full h-full w-full" />
+            <img
+              src={data.user.profile_image}
+              alt=""
+              className="rounded-full h-full w-full"
+            />
           </div>
           <div className="">
-            <h3 className="font-bold text-gray-700">Emmanuel Stephen</h3>
-            <p className="text-xs font-semibold text-gray-500">12:00pm</p>
+            <h3 className="font-bold text-gray-700">{data.user.name}</h3>
+            <p className="text-xs font-semibold text-gray-500">
+              {formatDate(data.createdAt)}
+            </p>
           </div>
         </div>
-        <p className="text-gray-800 p-4">
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Temporibus
-          quo amet nihil facilis corrupti labore deserunt praesentium eos
-          reprehenderit natus autem deleniti dignissimos, dolorem vel error
-          ullam blanditiis ut dolore.
-        </p>
-        <div className="border grid">
-          <img src={FarmBg1} alt="" />
+        <p className="text-gray-800 p-4">{data.description}</p>
+        <div className="border grid grid-flow-col grid-cols-subgrid gap-3">
+          {data.media.map((item, index) => (
+            <img src={item} alt="" key={index} />
+          ))}
         </div>
       </Link>
       <div className="flex justify-between items-center p-4">
         <h3 className="text-gray-500 cursor-pointer">
-          <FontAwesomeIcon icon={faThumbsUp} /> 300
+          <FontAwesomeIcon icon={faThumbsUp} /> {data.likes.length}
         </h3>
         <h3 className="text-gray-500 cursor-pointer">
-          <FontAwesomeIcon icon={faComment} /> 80 Comments
+          <FontAwesomeIcon icon={faComment} /> {data.comments.length} Comments
         </h3>
         <h3 className="text-gray-500 cursor-pointer">
           <FontAwesomeIcon icon={faPhone} /> Call
