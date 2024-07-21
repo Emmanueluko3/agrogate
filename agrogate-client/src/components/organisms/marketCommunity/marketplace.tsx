@@ -108,20 +108,26 @@ const Marketplace: React.FC = () => {
     return !hasErrors;
   };
 
-  const handleCreateProduct = async () => {
-    try {
-      setIsLoading(true);
-      await setTimeout(() => {
-        setIsLoading(false);
-      }, 4000);
+  console.log("data", createProductData);
 
-      if (validateForm()) {
-        // Submit form
+  const handleCreateProduct = async () => {
+    if (validateForm()) {
+      try {
+        setIsLoading(true);
+
+        const response: any = await apiService(
+          "/api/v1/products",
+          "POST",
+          createProductData
+        );
+        if (response.data) {
+          fetchPosts();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -178,6 +184,7 @@ const Marketplace: React.FC = () => {
             <Input
               label="Product title"
               placeholder="Fresh tomato"
+              name="title"
               disabled={isLoading}
               value={createProductData.title}
               onChange={handleChange}
@@ -190,6 +197,7 @@ const Marketplace: React.FC = () => {
             <Input
               label="Price"
               placeholder="$57.00"
+              name="price"
               disabled={isLoading}
               value={createProductData.price}
               onChange={handleChange}
