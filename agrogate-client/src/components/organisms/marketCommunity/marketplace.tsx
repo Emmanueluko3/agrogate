@@ -6,6 +6,7 @@ import Input from "../../atoms/inputs/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import apiService from "../../../api/apiService";
+import { globalAxios } from "../../../api/globalAxios";
 
 interface CreateData {
   title: string;
@@ -53,6 +54,21 @@ const Marketplace: React.FC = () => {
     fetchPosts();
   }, [tab]);
 
+  const clearFormData = () => {
+    setCreateProductData({
+      title: "",
+      description: "",
+      price: "",
+      images: [],
+    });
+    setErrors({
+      title: "",
+      description: "",
+      price: "",
+      images: "",
+    });
+  };
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>
   ) => {
@@ -60,16 +76,22 @@ const Marketplace: React.FC = () => {
 
     if (type === "file") {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setCreateProductData({
-            ...createProductData,
-            [name]: [...createProductData.images, reader.result],
-          });
-        };
-        reader.readAsDataURL(file);
-      }
+
+      setCreateProductData({
+        ...createProductData,
+        [name]: [...createProductData.images, file],
+      });
+
+      // if (file) {
+      //   const reader = new FileReader();
+      //   reader.onloadend = () => {
+      //     setCreateProductData({
+      //       ...createProductData,
+      //       [name]: [...createProductData.images, reader.result],
+      //     });
+      //   };
+      //   reader.readAsDataURL(file);
+      // }
     } else
       setCreateProductData({
         ...createProductData,
@@ -111,16 +133,33 @@ const Marketplace: React.FC = () => {
   console.log("data", createProductData);
 
   const handleCreateProduct = async () => {
+    const { title, description, price, images } = createProductData;
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("price", price);
+    for (let i = 0; i < images.length; i++) {
+      formData.append("images", images[i]);
+    }
+
     if (validateForm()) {
       try {
         setIsLoading(true);
+        console.log(formData);
 
-        const response: any = await apiService(
+        const response: any = await globalAxios.post(
           "/api/v1/products",
-          "POST",
-          createProductData
+          formData,
+          {
+            headers: {
+              ...globalAxios.defaults.headers.common,
+              "Content-Type": "multipart/form-data",
+              Accept: "application/json",
+            },
+          }
         );
         if (response.data) {
+          clearFormData();
           fetchPosts();
         }
       } catch (error) {
@@ -134,7 +173,10 @@ const Marketplace: React.FC = () => {
   const createModal = (
     <ModalComponent
       open={createModalState}
-      onclose={() => setCreateModalState(false)}
+      onclose={() => {
+        setCreateModalState(false);
+        clearFormData();
+      }}
       title="Create Listing"
     >
       <div className="mb-6">
@@ -142,7 +184,11 @@ const Marketplace: React.FC = () => {
           <div className="rounded-lg border min-h-28 lg:min-h-36 mb-2 relative grid grid-flow-row grid-cols-2 gap-6">
             {createProductData.images.map((item, index) => (
               <div key={index} className="w-full lg:h-32 h-24">
-                <img src={item} className="h-full w-full rounded-lg" alt="" />
+                <img
+                  src={URL.createObjectURL(item)}
+                  className="h-full w-full rounded-lg"
+                  alt=""
+                />
               </div>
             ))}
             {createProductData.images.length > 0 ? (

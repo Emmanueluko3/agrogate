@@ -7,11 +7,23 @@ const {
 } = require("../schema/product.schema");
 const { BadRequestError, UnauthorizedError, NotFound } = require("../errors");
 const { fromZodError } = require("zod-validation-error");
+const { imageUploader } = require("../utils/imageUploader");
 
 const createProduct = asyncErrorHandler(async (req, res) => {
   const user = req.id;
+  const { title, description, price } = req.body;
 
-  const result = createProductSchema.safeParse(req.body);
+  const files = req.files;
+  const images = await imageUploader(files);
+
+  const data = {
+    title,
+    description,
+    price: parseFloat(price),
+    images,
+  };
+
+  const result = createProductSchema.safeParse(data);
 
   if (!result.success) {
     throw new BadRequestError(fromZodError(result.error).toString());
@@ -55,6 +67,26 @@ const updateProductController = asyncErrorHandler(async (req, res) => {
     .json({ status: StatusCodes.OK, message: "Successful", product });
 });
 
+const deleteProductController = asyncErrorHandler(async (req, res) => {
+  const userId = req.id;
+  const { id } = req.params;
+
+  const product = await Product.findById(id);
+  if (!product) throw new NotFound("Product not found");
+
+  if (product.user._id.toString() !== userId.toString())
+    throw new UnauthorizedError(
+      "You are not authorized to delete this product"
+    );
+
+  await Product.findByIdAndDelete(id);
+
+  return res.status(StatusCodes.OK).json({
+    status: StatusCodes.OK,
+    message: "Product deleted successfully",
+  });
+});
+
 const getProductsByUser = asyncErrorHandler(async (req, res) => {
   const user = req.id;
 
@@ -78,6 +110,7 @@ const getAllProducts = asyncErrorHandler(async (req, res) => {
 module.exports = {
   createProduct,
   updateProductController,
+  deleteProductController,
   getProductsByUser,
   getAllProducts,
 };

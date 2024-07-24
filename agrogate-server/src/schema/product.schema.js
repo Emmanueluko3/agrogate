@@ -13,7 +13,9 @@ const updateProductSchema = z.object({
   title: z.string().min(1).optional(),
   price: z.number().positive().optional(),
   description: z.string().optional(),
-  images: z.array(z.string().url()).optional(),
+  images: z
+    .array(z.instanceof(File))
+    .min(1, { message: "At least one image is required" }),
 });
 
 module.exports = { createProductSchema, updateProductSchema };
