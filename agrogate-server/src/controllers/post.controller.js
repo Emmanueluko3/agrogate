@@ -5,11 +5,20 @@ const { StatusCodes } = require("http-status-codes");
 const { fromZodError } = require("zod-validation-error");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const { createPostSchema } = require("../schema/post.schema");
+const { imageUploader } = require("../utils/imageUploader");
 
 const createPostController = asyncErrorHandler(async (req, res) => {
   const user = req.id;
 
-  const result = createPostSchema.safeParse(req.body);
+  const files = req.files;
+  const media = await imageUploader(files);
+
+  const data = {
+    ...req.body,
+    media: media,
+  };
+
+  const result = createPostSchema.safeParse(data);
 
   if (!result.success) {
     throw new BadRequestError(fromZodError(result.error).toString());

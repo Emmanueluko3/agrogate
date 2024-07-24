@@ -12,7 +12,7 @@ const { imageUploader } = require("../utils/imageUploader");
 const createProduct = asyncErrorHandler(async (req, res) => {
   const user = req.id;
   const { title, description, price } = req.body;
-
+  d;
   const files = req.files;
   const images = await imageUploader(files);
 
