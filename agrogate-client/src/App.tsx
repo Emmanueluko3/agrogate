@@ -52,6 +52,22 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/marketcommunity/marketplace",
+    element: (
+      <ProtectedRoute>
+        <MarketCommunity />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/marketcommunity/marketplace/:productId",
+    element: (
+      <ProtectedRoute>
+        <MarketCommunity />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/profile",
     element: (
       <ProtectedRoute>

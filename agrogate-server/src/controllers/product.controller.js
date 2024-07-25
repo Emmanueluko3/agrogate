@@ -12,7 +12,6 @@ const { imageUploader } = require("../utils/imageUploader");
 const createProduct = asyncErrorHandler(async (req, res) => {
   const user = req.id;
   const { title, description, price } = req.body;
-  d;
   const files = req.files;
   const images = await imageUploader(files);
 
@@ -90,18 +89,18 @@ const deleteProductController = asyncErrorHandler(async (req, res) => {
 const getProductsByUser = asyncErrorHandler(async (req, res) => {
   const user = req.id;
 
-  const data = await Product.find({ user });
+  const data = await Product.find({ user }).sort({ createdAt: -1 });
   return res
     .status(StatusCodes.OK)
     .json({ status: StatusCodes.OK, message: "Successful", data });
 });
 
 const getAllProducts = asyncErrorHandler(async (req, res) => {
-  const data = await Product.find({}).populate("user", [
-    "name",
-    "profile_image",
-    "phone_number",
-  ]);
+  const allProducts = await Product.find({})
+    .populate("user", ["name", "profile_image", "phone_number", "country"])
+    .sort({ createdAt: -1 });
+
+  const data = allProducts.sort(() => Math.random() - 0.5);
   return res
     .status(StatusCodes.OK)
     .json({ status: StatusCodes.OK, message: "Successful", data });

@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import HomeTemplate from "../../templates/HomeTemplate";
 import Marketplace from "../../organisms/marketCommunity/marketplace";
 import Community from "../../organisms/marketCommunity/community";
+// import { useParams } from "react-router-dom";
 
 const MarketCommunity: React.FC = () => {
+  // const {} = useParams();
+
   const tabs = ["Marketplace", "Community"];
   const [tab, setTab] = useState(tabs[0]);
   return (

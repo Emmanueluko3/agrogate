@@ -114,8 +114,8 @@ export const Footerbar: React.FC = () => {
           <h3
             className={`p-2 rounded-lg ${
               location === link.href
-                ? "text-primaryColor bg-[#FFF8F1] bg-opacity-10"
-                : "text-primary-450"
+                ? "text-primary-450 bg-primary-500 bg-opacity-10"
+                : "text-gray-400"
             } flex items-center font-bold text-base flex-col`}
           >
             <FontAwesomeIcon icon={link.icon} />

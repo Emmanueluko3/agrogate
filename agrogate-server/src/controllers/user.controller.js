@@ -4,6 +4,7 @@ const { StatusCodes } = require("http-status-codes");
 const { fromZodError } = require("zod-validation-error");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 const { updateUserSchema } = require("../schema/user.schema");
+const { imageUploader } = require("../utils/imageUploader");
 
 const getUserController = asyncErrorHandler(async (req, res) => {
   const userId = req.id;
@@ -19,7 +20,19 @@ const getUserController = asyncErrorHandler(async (req, res) => {
 
 const updateUserController = asyncErrorHandler(async (req, res) => {
   const userId = req.id;
-  const result = updateUserSchema.safeParse(req.body);
+  const files = req.files;
+  const profile_image =
+    files.profile_image && (await imageUploader(files.profile_image))[0];
+  const cover_image =
+    files.cover_image && (await imageUploader(files.cover_image))[0];
+
+  const redBody = {
+    ...req.body,
+    profile_image: profile_image,
+    cover_image: cover_image,
+  };
+
+  const result = updateUserSchema.safeParse(redBody);
 
   if (!result.success) {
     throw new BadRequestError(fromZodError(result.error).toString());

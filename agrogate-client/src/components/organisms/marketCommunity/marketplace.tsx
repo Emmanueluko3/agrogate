@@ -7,6 +7,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import apiService from "../../../api/apiService";
 import { globalAxios } from "../../../api/globalAxios";
+import { useParams } from "react-router-dom";
+import PreviewProduct from "../../molecules/Cards/previewProduct";
 
 interface CreateData {
   title: string;
@@ -16,6 +18,7 @@ interface CreateData {
 }
 
 const Marketplace: React.FC = () => {
+  const { productId } = useParams();
   const tabs = ["Explore", "My Listings"];
   const [tab, setTab] = useState(tabs[0]);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -35,7 +38,7 @@ const Marketplace: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [products, setProducts] = useState([]);
-  const fetchPosts = async () => {
+  const fetchProducts = async () => {
     try {
       const response: any = await apiService(
         `/api/v1/products${tab == "My Listings" ? "/me" : ""}`,
@@ -51,9 +54,8 @@ const Marketplace: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchProducts();
   }, [tab]);
-
   const clearFormData = () => {
     setCreateProductData({
       title: "",
@@ -130,17 +132,18 @@ const Marketplace: React.FC = () => {
     return !hasErrors;
   };
 
-  console.log("data", createProductData);
-
   const handleCreateProduct = async () => {
     const { title, description, price, images } = createProductData;
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
     formData.append("price", price);
-    for (let i = 0; i < images.length; i++) {
-      formData.append("images", images[i]);
+    for (const image of images) {
+      formData.append("images", image);
     }
+    // for (let i = 0; i < images.length; i++) {
+    //   formData.append("images", images[i]);
+    // }
 
     if (validateForm()) {
       try {
@@ -160,7 +163,7 @@ const Marketplace: React.FC = () => {
         );
         if (response.data) {
           clearFormData();
-          fetchPosts();
+          fetchProducts();
         }
       } catch (error) {
         console.log(error);
@@ -308,6 +311,11 @@ const Marketplace: React.FC = () => {
       </div>
 
       <div className="w-full grid grid-flow-row grid-cols-2 lg:grid-cols-4 gap-4 min-h-[70vh] md:px-6 px-2">
+        {productId && (
+          <PreviewProduct
+            data={products.filter((item: any) => item.id === productId)[0]}
+          />
+        )}
         {products.map((item, index) => (
           <ProductCard key={index} data={item} />
         ))}

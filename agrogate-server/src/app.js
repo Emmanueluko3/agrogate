@@ -14,6 +14,7 @@ const verifyJWT = require("./middlewares/verifyJWT");
 const applyUploadMiddleware = require("./middlewares/uploads");
 const authRouter = require("./routes/auth.route");
 const profileRouter = require("./routes/user.route");
+const diagnosisRouter = require("./routes/diagnosis.route");
 const postRouter = require("./routes/post.route");
 const productRouter = require("./routes/product.route");
 
@@ -36,6 +37,7 @@ app.use("/api/v1/auth", authRouter);
 app.use(verifyJWT);
 app.use(applyUploadMiddleware);
 app.use("/api/v1/profile", profileRouter);
+app.use("/api/v1/diagnosis", diagnosisRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/products", productRouter);
 

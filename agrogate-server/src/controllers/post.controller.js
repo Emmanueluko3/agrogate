@@ -139,14 +139,15 @@ const getPostsByUser = asyncErrorHandler(async (req, res) => {
         path: "user",
         select: "name",
       },
-    });
+    })
+    .sort({ createdAt: -1 });
   return res
     .status(StatusCodes.OK)
     .json({ status: StatusCodes.OK, message: "Successful", data });
 });
 
 const getAllPostsController = asyncErrorHandler(async (req, res) => {
-  const data = await Post.find()
+  const allPosts = await Post.find()
     .populate("user", ["name", "profile_image"])
     .populate({
       path: "comments.user",
@@ -159,6 +160,8 @@ const getAllPostsController = asyncErrorHandler(async (req, res) => {
         select: "name",
       },
     });
+
+  const data = allPosts.sort(() => Math.random() - 0.5);
 
   return res
     .status(StatusCodes.OK)

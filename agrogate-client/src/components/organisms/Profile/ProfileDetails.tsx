@@ -1,4 +1,4 @@
-import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
+import { faCloudArrowUp, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import Button from "../../atoms/buttons/button";
@@ -17,8 +17,8 @@ interface ProfileDataProps {
   username: string;
   bio: string;
   country: string;
-  profile_image: string;
-  cover_image: string;
+  profile_image: any;
+  cover_image: any;
 }
 
 const ProfileDetails: React.FC = () => {
@@ -53,7 +53,6 @@ const ProfileDetails: React.FC = () => {
     }));
   };
 
-  // Setting user inputs when mounted or successful profile update
   useEffect(() => {
     setprofileData();
     fetchPosts();
@@ -105,6 +104,56 @@ const ProfileDetails: React.FC = () => {
     }
   };
 
+  const handleUpdateProfileImage = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("profile_image", profileData?.profile_image);
+      const response: any = await globalAxios.patch(
+        "/api/v1/profile",
+        formData,
+        {
+          headers: {
+            ...globalAxios.defaults.headers.common,
+            "Content-Type": "multipart/form-data",
+            Accept: "application/json",
+          },
+        }
+      );
+      if (response?.data?.data) {
+        console.log("Successful! 🎉 ");
+        dispatch(fetchProfile());
+      }
+    } catch (error: any) {
+      console.error("Error ", error);
+      setprofileData();
+    }
+  };
+
+  const handleUpdateCoverImage = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("cover_image", profileData?.cover_image);
+      const response: any = await globalAxios.patch(
+        "/api/v1/profile",
+        formData,
+        {
+          headers: {
+            ...globalAxios.defaults.headers.common,
+            "Content-Type": "multipart/form-data",
+            Accept: "application/json",
+          },
+        }
+      );
+      if (response?.data?.data) {
+        console.log("Successful! 🎉 ");
+        dispatch(fetchProfile());
+      }
+    } catch (error: any) {
+      console.error("Error ", error);
+      setprofileData();
+    }
+  };
+
   const handleInputChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLInputElement
@@ -138,6 +187,23 @@ const ProfileDetails: React.FC = () => {
     }
   };
 
+  const handleProfileInputChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, type } = e.target;
+
+    if (type === "file") {
+      const file = (e.target as HTMLInputElement).files?.[0];
+
+      setProfileData({ ...profileData, [name]: file });
+    }
+
+    if (profileData.cover_image || profileData.profile_image) {
+      profileData.profile_image && handleUpdateProfileImage();
+      profileData.cover_image && handleUpdateCoverImage();
+    }
+  };
+
   const userPost = (
     <div className="flex flex-col">
       {posts.map((item: any, index) => (
@@ -167,18 +233,42 @@ const ProfileDetails: React.FC = () => {
           name="cover_image"
           ref={cover_imageInputRef}
           disabled={disableInput}
-          onChange={handleInputChange}
+          onChange={handleProfileInputChange}
         />
         <div className="lg:w-56 lg:h-56 h-20 w-20 rounded-2xl bg-white flex justify-center items-center absolute lg:-bottom-1/4 -bottom-1/3 left-1/2 md:left-20 transform -translate-x-1/2 md:-translate-x-0">
           {profileData?.profile_image ? (
-            <img
-              src={profileData?.profile_image}
-              alt=""
-              className="cursor-pointer rounded-2xl w-[95%] h-[95%]"
-              onClick={() => imageInputRef?.current?.click()}
-            />
+            <div className="relative w-[95%] h-[95%]">
+              <img
+                src={profileData?.profile_image}
+                alt=""
+                className="rounded-2xl w-full h-full"
+              />
+              <button
+                className="w-full cursor-pointer bottom-0 absolute py-1 bg-slate-50 bg-opacity-15 hover:bg-opacity-25 backdrop-blur-sm rounded-b-lg"
+                onClick={() => imageInputRef?.current?.click()}
+              >
+                <FontAwesomeIcon
+                  className="text-2xl text-gray-300"
+                  icon={faCloudArrowUp}
+                />
+              </button>
+            </div>
           ) : (
-            <FontAwesomeIcon className="w-[90%] h-[90%]" icon={faCircleUser} />
+            <div className="relative w-[90%] h-[90%]">
+              <FontAwesomeIcon
+                className="w-full h-full text-primary-450 block"
+                icon={faUser}
+              />
+              <button
+                className="w-full cursor-pointer bottom-0 absolute py-1 bg-slate-50 bg-opacity-15 hover:bg-opacity-25 backdrop-blur-sm rounded-b-lg"
+                onClick={() => imageInputRef?.current?.click()}
+              >
+                <FontAwesomeIcon
+                  className="text-2xl text-gray-300"
+                  icon={faCloudArrowUp}
+                />
+              </button>
+            </div>
           )}
           <input
             type="file"
@@ -186,7 +276,7 @@ const ProfileDetails: React.FC = () => {
             name="profile_image"
             ref={imageInputRef}
             disabled={disableInput}
-            onChange={handleInputChange}
+            onChange={handleProfileInputChange}
           />
         </div>
       </div>
