@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const Diagnose: React.FC = () => {
-  const { name }: any = useAppSelector((state) => state?.profile?.profile);
+  const profile: any = useAppSelector((state) => state?.profile?.profile);
 
   const [imageInput, setImageInput] = useState<any>("");
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -52,7 +52,7 @@ const Diagnose: React.FC = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: `Hello ${name}! Please upload an image to get started`,
+      text: `Hello ${profile?.name}! Please upload an image to get started`,
       sender: "ai",
     },
   ]);

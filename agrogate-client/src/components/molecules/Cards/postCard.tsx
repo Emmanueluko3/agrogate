@@ -65,9 +65,12 @@ const PostCard: React.FC<PostCardProps> = ({ data }) => {
         <h3 className="text-gray-500 cursor-pointer">
           <FontAwesomeIcon icon={faComment} /> {data.comments.length} Comments
         </h3>
-        <h3 className="text-gray-500 cursor-pointer">
+        <a
+          href={`tel:${data.user.phone_number}`}
+          className="text-gray-500 cursor-pointer"
+        >
           <FontAwesomeIcon icon={faPhone} /> Call
-        </h3>
+        </a>
       </div>
     </div>
   );

@@ -17,6 +17,9 @@ const profileRouter = require("./routes/user.route");
 const diagnosisRouter = require("./routes/diagnosis.route");
 const postRouter = require("./routes/post.route");
 const productRouter = require("./routes/product.route");
+const groupRouter = require("./routes/group.route");
+const messageRouter = require("./routes/chat.route");
+const socketSetup = require("./controllers/socketIo/group.socket.io.controller");
 
 connectDB(process.env.MONGODB_URI);
 
@@ -26,6 +29,8 @@ app.use(cookieParser());
 app.use(express.urlencoded({ limit: "50mb", extended: false }));
 
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+socketSetup(server);
 
 app.get("/", (req, res) => {
   console.log("Home route requested");
@@ -40,6 +45,8 @@ app.use("/api/v1/profile", profileRouter);
 app.use("/api/v1/diagnosis", diagnosisRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/group", groupRouter);
+app.use("/api/v1/messages", messageRouter);
 
 app.use(errorHandlerMiddleware);
 app.use(routeNotFound);

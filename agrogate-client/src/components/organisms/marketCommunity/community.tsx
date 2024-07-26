@@ -5,6 +5,7 @@ import Button from "../../atoms/buttons/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
 import apiService from "../../../api/apiService";
+import Group from "../../molecules/Chat/group";
 
 const Community: React.FC = () => {
   const [posts, setPosts] = useState([]);
@@ -57,25 +58,7 @@ const Community: React.FC = () => {
         </div>
       </div>
       <div className="bg-[#fff] rounded-lg lg:mb-6 mb-4 w-full col-span-2 h-fit py-4">
-        <h3 className="font-bold text-primary-500 border-b border-primary-200 px-4 pb-2 mb-4">
-          Groups
-        </h3>
-        <div className="flex flex-col">
-          <div className="flex items-center px-4 hover:bg-primary-100 cursor-pointer">
-            <img src={User} className="rounded-lg h-10 w-10 mr-2" alt="" />
-            <div className="py-2">
-              <h3 className="font-semibold leading-none">Farmers Forum</h3>
-              <p className="text-sm text-gray-600">1 new message</p>
-            </div>
-          </div>
-          <div className="flex items-center px-4 hover:bg-primary-100 cursor-pointer">
-            <img src={User} className="rounded-lg h-10 w-10 mr-2" alt="" />
-            <div className="py-2">
-              <h3 className="font-semibold leading-none">Weather Chats</h3>
-              <p className="text-sm text-gray-600">52 new messages</p>
-            </div>
-          </div>
-        </div>
+        <Group />
       </div>
     </div>
   );

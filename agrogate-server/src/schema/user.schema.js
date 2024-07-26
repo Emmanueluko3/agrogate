@@ -27,4 +27,9 @@ const updateUserSchema = z
   })
   .strict();
 
-module.exports = { updateUserSchema };
+const joinRoomSchema = z.object({
+  name: z.string({ required_error: "Name is required" }),
+  room: z.string({ required_error: "Room is required" }),
+});
+
+module.exports = { updateUserSchema, joinRoomSchema };
