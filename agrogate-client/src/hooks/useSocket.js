@@ -7,9 +7,9 @@ const useSocket = () => {
   useEffect(() => {
     setSocket(initializedSocket);
 
-    return () => {
-      initializedSocket.close();
-    };
+    // return () => {
+    //   initializedSocket.close();
+    // };
   }, []);
 
   return socket;

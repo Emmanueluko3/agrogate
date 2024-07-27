@@ -1,27 +1,28 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import Input from "../../atoms/inputs/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import useSocket from "../../../hooks/useSocket";
 
-interface ChatUIProps {
-  data: {
-    id: any;
-    images: [string];
-    title: string;
-    description: string;
-    price: number | string;
-    user: {
-      name: string;
-      profile_image: string;
-      phone_number: string;
-      country: string;
-    };
-  };
-}
+// interface GroupData {
+//     data:
+//       | {
+//           id: string;
+//           name: string;
+//           about: string;
+//           imageUrl: string;
+//           members: [];
+//           messages: [];
+//           createdAt: string;
+//           updatedAt: string;
+//         }
+//       | null
+//       | object;
+//   }
+const ChatUI: React.FC<any> = ({ data }) => {
+  const { name } = data;
+  const socket: any = useSocket();
 
-const ChatUI: React.FC<ChatUIProps> = ({ data }) => {
-  // ai reports
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -30,6 +31,29 @@ const ChatUI: React.FC<ChatUIProps> = ({ data }) => {
       sender: "ai",
     },
   ]);
+
+  console.log(messages);
+
+  useEffect(() => {
+    if (!socket) return;
+    // Join the room when the component mounts
+    const groupIdenFyer = name.replaceAll(" ", "");
+    socket.emit("joinRoom", { groupIdenFyer });
+    // Listen for messages from the server
+    socket.on("message", (msg: any) => {
+      setMessages((prevMessages) => [...prevMessages, msg]);
+    });
+    // Load previous messages
+    socket.emit("load_messages", { groupIdenFyer });
+    // Listen for previous messages
+    socket.on("prev_messages", (prevMessages: any) => {
+      setMessages(prevMessages);
+    });
+    return () => {
+      // Leave room when the component unmounts
+      socket.emit("leaveRoom", { groupIdenFyer });
+    };
+  }, [socket]);
   const sendMessage = async () => {
     if (messageInput.trim() === "") return;
 
@@ -43,10 +67,18 @@ const ChatUI: React.FC<ChatUIProps> = ({ data }) => {
     setMessageInput("");
   };
 
+  //   const sendMessage = () => {
+  //     if (socket && message.trim()) {
+  //       // Emit message to server
+  //       socket.emit('groupChatMessage', { groupName: room, message });
+  //       setMessage('');
+  //     }
+  //   };
+
   return (
     <div className="col-span-2 rounded-lg border h-fit">
       <h2 className="lg:text-xl text-lg rounded-t-lg p-2 text-center font-semibold text-gray-900 bg-primary-100">
-        Reports
+        {name}
       </h2>
       <div className="flex-1 p-4 h-80 overflow-y-auto">
         {messages.map((message) => (

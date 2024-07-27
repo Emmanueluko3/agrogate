@@ -21,10 +21,14 @@ const Footer: React.FC = () => {
     <div className=" bg-[#fff] w-full py-8 lg:px-16 px-4 lg:py-8 flex flex-col items-center justify-center">
       <div className="flex lg:items-center items-start justify-between lg:flex-row flex-col w-full border-b border-[#E5E6EB] mb-4 pb-4 lg:mb-8 lg:pb-8">
         <Link
-          to={user ? "/dashboard" : "/"}
+          to={user ? "/diagnosis" : "/"}
           className="flex items-center mb-6 lg:mb-0"
         >
-          <img src={Agrogate} className="lg:mr-4 mr-2 h-28 w-28" alt="Gift" />
+          <img
+            src={Agrogate}
+            className="lg:mr-4 mr-2 lg:h-28 lg:w-28 h-16 w-16"
+            alt="Gift"
+          />
           <h3 className=" text-primary-800 lg:text-2xl text-xl font-bold">
             AgroGate
           </h3>

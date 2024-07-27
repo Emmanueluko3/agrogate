@@ -38,17 +38,18 @@ module.exports = (server) => {
   // Runs when a client connects
   io.on("connection", (socket) => {
     const authUser = socket.user;
-    console.log("connected");
+    console.log("connected", authUser);
 
     socket.on("joinRoom", async ({ room }) => {
-      // pass token, username and room to join from the frontend
       const name = authUser.username;
 
       const user = await addUserToRoomController({
-        id: authUser._id,
+        id: authUser.id,
         name,
         room,
       });
+
+      console.log("Room:", room, user);
 
       if (!user) {
         socket.emit("message", formatMessage(ADMIN, "Group Does Not Exist"));
@@ -76,9 +77,11 @@ module.exports = (server) => {
 
     // Load previous messages
     socket.on("load_messages", async ({ room }) => {
-      const group = await Group.findOne({ name: room });
+      console.log("Loaded previous", room);
 
-      socket.emit("prev_messages", group.messages);
+      //   const group = await Group.findOne({ name: room });
+
+      //   socket.emit("prev_messages", group.messages);
     });
 
     // Listen for chatMessage for sending chat messages
@@ -103,9 +106,9 @@ module.exports = (server) => {
         .emit(`message`, formatMessage(authUser.username, message, authUser));
 
       const msg = {
-        sender_id: authUser.id,
+        senderid: authUser.id,
         sender_name: authUser.username,
-        receiver_id: group.id,
+        receiverid: group.id,
         message,
         createdAt: new Date(),
       };
@@ -119,7 +122,7 @@ module.exports = (server) => {
     //     const id = decodeToken(token)
     //     const user = await User.findById(id)
     //     io.to(recipient).emit('privateMessage', formatMessage(user.username, message))
-    //     const msg = await Message.create({ sender_id: user.id, message, receiver_id: recipient })
+    //     const msg = await Message.create({ senderid: user.id, message, receiverid: recipient })
 
     // })
 

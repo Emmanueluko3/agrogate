@@ -32,7 +32,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        adhiguno: ["Adhiguno", "sans-serif"],
+        BurgerFree: ["Burger Free", "sans-serif"],
       },
     },
   },

@@ -119,7 +119,7 @@ export const Footerbar: React.FC = () => {
             } flex items-center font-bold text-base flex-col`}
           >
             <FontAwesomeIcon icon={link.icon} />
-            <span className="text-xs mt-1">{link.label}</span>
+            <span className="text-xs mt-1 text-center">{link.label}</span>
           </h3>
         </Link>
       ))}
