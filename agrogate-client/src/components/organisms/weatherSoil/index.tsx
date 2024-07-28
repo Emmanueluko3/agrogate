@@ -17,8 +17,8 @@ const WeatherSoilComp: React.FC = () => {
           Weather and Soil
         </h2>
 
-        <div className="grid grid-flow-row grid-cols-6 gap-8">
-          <div className="col-span-3 rounded-lg border h-fit">
+        <div className="grid grid-flow-row grid-cols-6 gap-8 w-full">
+          <div className="col-span-6 lg:col-span-3 rounded-lg border h-fit">
             <h2 className="lg:text-xl text-lg rounded-t-lg p-2 text-center font-semibold text-gray-900 bg-primary-100 relative">
               <Input
                 className="bg-transparent text-gray-600 border-white"
@@ -31,14 +31,14 @@ const WeatherSoilComp: React.FC = () => {
                 />
               </button>
             </h2>
-            <div className="flex-1 p-4 min-h-72 overflow-y-auto">
+            <div className="flex-1 p-4 min-h-72">
               <p className="text-base text-gray-500 mb-2">
                 Wheather Based on your location
               </p>
               <img src={WeatherForecaset} className="w-full h-64" alt="" />
             </div>
           </div>
-          <div className="col-span-3 rounded-lg border h-fit">
+          <div className="col-span-6 lg:col-span-3 rounded-lg border h-fit">
             <h2 className="lg:text-xl text-lg rounded-t-lg p-2 text-center font-semibold text-gray-900 bg-primary-100">
               Soil
             </h2>
