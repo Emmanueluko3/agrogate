@@ -1,16 +1,16 @@
 Agrogate: An AI Powered Agricultural Application.
 
-LINKS:
+**LINKS:**
 
 GitHub Repo:https://github.com/Emmanueluko3/agrogate.git
 
 Live Link:https://agrogatefarm.vercel.app/
 
-DESCRIPTION:
+**DESCRIPTION:**
 
 The Agrogate App is designed to assist farmers by leveraging AI technology to improve productivity and provide valuable insights. The app aims to make farming more efficient and profitable by offering tools for crop disease identification, pest control advice, weather forecasting, soil analysis, and market insights. The platform also fosters a community of farmers who can share experiences and advice.
 
-FEATURES
+**FEATURES**
 
 1. Home and Diagnosis:
    Crop Disease Identification:
@@ -61,7 +61,7 @@ FEATURES
    Expanded Community Features: Introduce more interactive features in the community forum, such as live chat and events.
    Enhanced Data Analytics: Provide more in-depth data analytics and insights for farmers based on historical trends and data.
 
-TECH STACK
+**TECH STACK**
 Frontend
 React.js: Utilized for building the user interface, providing a responsive and interactive experience for users.
 Redux: A state management library. This choice facilitated the centralization of data, ensuring a predictable data flow and simplified interactions. With Redux, I effectively handled complex data flows while upholding maintainable and structured code practices.
@@ -76,10 +76,10 @@ Multer: Middleware for handling file uploads, used to process images uploaded fo
 Cloudinary: A cloud-based image and video management service used for storing and processing uploaded images.
 AI and Machine Learning
 OpenAI API: Utilized for image analysis and natural language processing to identify crop or animal diseases and provide pest control advice.
-CONCLUSION
+**CONCLUSION**
 The Agricultural Advisor App is an innovative solution aimed at transforming the agricultural sector by providing farmers with the tools and information needed to make informed decisions and improve productivity. With its intuitive design and AI-powered features, the app empowers farmers to optimize their operations and connect with a broader community.
 
-CONTRIBUTIONS:
+**CONTRIBUTIONS:**
 We invite the community to participate in enhancing PrimePick. If you'd like to contribute, kindly follow these steps:
 
 Fork the repository and download it to your local device.
