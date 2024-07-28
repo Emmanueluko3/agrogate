@@ -4,9 +4,11 @@ import Button from "../../atoms/buttons/button";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faBook,
   faCloudArrowUp,
   faHeartPulse,
 } from "@fortawesome/free-solid-svg-icons";
+import apiService from "../../../api/apiService";
 
 const Diagnose: React.FC = () => {
   const profile: any = useAppSelector((state) => state?.profile?.profile);
@@ -14,6 +16,7 @@ const Diagnose: React.FC = () => {
   const [imageInput, setImageInput] = useState<any>("");
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [reports, setReports] = useState();
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLInputElement>
@@ -35,13 +38,22 @@ const Diagnose: React.FC = () => {
     }
   };
 
-  console.log("input file", imageInput);
-
-  const handleDiagnose = () => {
+  const handleDiagnose = async () => {
+    const formData = new FormData();
+    formData.append("image", imageInput);
     try {
       setIsLoading(true);
-      console.log("Input image:", imageInput);
-    } catch (error) {
+      const response: any = await apiService(
+        "/api/v1/diagnosis",
+        "POST",
+        formData
+      );
+      if (response.data) {
+        const data = response?.data;
+        setReports(data?.data);
+      }
+    } catch (error: any) {
+      setReports(error?.response?.data?.message);
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -64,7 +76,7 @@ const Diagnose: React.FC = () => {
       </div>
 
       <div className="grid grid-flow-row grid-cols-5 gap-8">
-        <div className="col-span-3 rounded-lg">
+        <div className="col-span-5 lg:col-span-3 rounded-lg">
           <input
             type="file"
             className="hidden"
@@ -78,13 +90,14 @@ const Diagnose: React.FC = () => {
               <div className="rounded-lg w-full mb-4 flex items-center justify-center relative">
                 <img
                   src={imageInput}
-                  className="rounded-lg w-full h-80"
+                  className="rounded-lg w-full h-60 lg:h-80"
                   alt=""
                 />
 
                 <button
-                  className="w-full cursor-pointer bottom-0 absolute py-2 bg-slate-50 bg-opacity-15 hover:bg-opacity-25 backdrop-blur-sm rounded-b-lg"
+                  className={`w-full bottom-0 absolute py-2 bg-slate-50 bg-opacity-15 hover:bg-opacity-25 backdrop-blur-sm rounded-b-lg ${isLoading ? "cursor-wait" : "cursor-pointer"}`}
                   onClick={() => imageInputRef?.current?.click()}
+                  disabled={isLoading}
                 >
                   <FontAwesomeIcon
                     className="text-3xl text-gray-300"
@@ -93,12 +106,17 @@ const Diagnose: React.FC = () => {
                 </button>
               </div>
 
-              <Button onClick={handleDiagnose} className="text-white">
+              <Button
+                disabled={isLoading}
+                isLoading={isLoading}
+                onClick={handleDiagnose}
+                className="text-white"
+              >
                 Diagnose
               </Button>
             </>
           ) : (
-            <div className="bg-primary-50 rounded-lg w-full h-96 flex items-center justify-center flex-col relative">
+            <div className="bg-primary-50 rounded-lg w-full h-64 lg:h-96 flex items-center justify-center flex-col relative">
               <FontAwesomeIcon
                 className="text-8xl opacity-5 absolute drop-shadow-2xl z-10"
                 icon={faHeartPulse}
@@ -125,25 +143,20 @@ const Diagnose: React.FC = () => {
         </div>
 
         {/* Ai reports */}
-        <div className="col-span-2 rounded-lg border h-fit">
+        <div className="col-span-5 lg:col-span-2 rounded-lg border h-fit">
           <h2 className="lg:text-xl text-lg rounded-t-lg p-2 text-center font-semibold text-gray-900 bg-primary-100">
             Reports
           </h2>
-          <div className="flex-1 p-4 h-80 overflow-y-auto">
-            <p className="text-primary-700">
-              hello {profile.name} Lorem ipsum dolor sit, amet consectetur
-              adipisicing elit. Libero molestias eligendi veniam cumque
-              praesentium voluptatem reiciendis, dolorum totam quae doloremque
-              quia tempora sequi distinctio odit ut rerum quam saepe cupiditate!
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-              Temporibus esse assumenda odio in autem voluptate quibusdam
-              officia dignissimos nam ratione harum mollitia nemo incidunt
-              quaerat modi, ut accusantium architecto earum? Lorem ipsum dolor
-              sit, amet consectetur adipisicing elit. Maxime, tenetur, dolorum
-              beatae odit ex aut et necessitatibus doloribus, quaerat ut ducimus
-              repellendus quia doloremque quasi! Maxime cum dolores molestias
-              suscipit?
-            </p>
+          <div className="flex-1 p-4 h-80 overflow-y-auto relative w-full">
+            <FontAwesomeIcon
+              className="text-8xl opacity-5 absolute drop-shadow-2xl z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              icon={faBook}
+            />
+            {reports ? (
+              <p className="text-primary-700 w-full">{reports}</p>
+            ) : (
+              <p className="text-primary-700">Hello {profile.name}!</p>
+            )}
           </div>
         </div>
       </div>

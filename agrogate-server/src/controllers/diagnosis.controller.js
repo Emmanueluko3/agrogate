@@ -4,7 +4,7 @@ const openai = require("../config/openai");
 const detectDiseaseController = asyncErrorHandler(async (req, res) => {
   const base64Image = "base64";
   const chatCompletion = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-3.5-turbo",
     messages: [
       {
         role: "system",
@@ -26,7 +26,7 @@ const detectDiseaseController = asyncErrorHandler(async (req, res) => {
         ],
       },
     ],
-    max_tokens: maxTokens,
+    max_tokens: 50,
   });
   const data = chatCompletion.choices[0].message.content;
   return res
