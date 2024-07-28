@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faThumbsUp } from "@fortawesome/free-regular-svg-icons";
+import { faComment, faHeart } from "@fortawesome/free-regular-svg-icons";
 import { faPhone } from "@fortawesome/free-solid-svg-icons";
 
 interface PostCardProps {
@@ -35,36 +35,37 @@ const formatDate = (date: string) => {
 const PostCard: React.FC<PostCardProps> = ({ data }) => {
   return (
     <div className="bg-[#fff] rounded-lg lg:mb-6 mb-4 w-full border border-primary-100">
-      <Link to={`/community/post/${data.id}`}>
-        <div className="flex items-center pt-4 px-4">
-          <div className="h-10 w-10 rounded-full mr-2">
-            <img
-              src={data.user.profile_image}
-              alt=""
-              className="rounded-full h-full w-full"
-            />
-          </div>
-          <div className="">
-            <h3 className="font-bold text-gray-700">{data.user.name}</h3>
-            <p className="text-xs font-semibold text-gray-500">
-              {formatDate(data.createdAt)}
-            </p>
-          </div>
+      <div className="flex items-center pt-4 px-4">
+        <div className="h-10 w-10 rounded-full mr-2">
+          <img
+            src={data.user.profile_image}
+            alt=""
+            className="rounded-full h-full w-full"
+          />
         </div>
-        <p className="text-gray-800 p-4">{data.description}</p>
-        <div className="border grid grid-flow-col grid-cols-subgrid gap-3">
-          {data.media.map((item, index) => (
-            <img src={item} alt="" key={index} />
-          ))}
+        <div className="">
+          <h3 className="font-bold text-gray-700">{data.user.name}</h3>
+          <p className="text-xs font-semibold text-gray-500">
+            {formatDate(data.createdAt)}
+          </p>
         </div>
-      </Link>
+      </div>
+      <p className="text-gray-800 p-4">{data.description}</p>
+      <div className="border grid grid-flow-col grid-cols-subgrid gap-3">
+        {data.media.map((item, index) => (
+          <img src={item} alt="" key={index} />
+        ))}
+      </div>
+
       <div className="flex justify-between items-center p-4">
         <h3 className="text-gray-500 cursor-pointer">
-          <FontAwesomeIcon icon={faThumbsUp} /> {data.likes.length}
+          <FontAwesomeIcon icon={faHeart} /> {data.likes.length}
         </h3>
-        <h3 className="text-gray-500 cursor-pointer">
-          <FontAwesomeIcon icon={faComment} /> {data.comments.length} Comments
-        </h3>
+        <Link to={`/community/post/${data.id}`}>
+          <h3 className="text-gray-500 cursor-pointer">
+            <FontAwesomeIcon icon={faComment} /> {data.comments.length} Comments
+          </h3>
+        </Link>
         <a
           href={`tel:${data.user.phone_number}`}
           className="text-gray-500 cursor-pointer"

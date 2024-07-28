@@ -155,7 +155,7 @@ const Diagnose: React.FC = () => {
             {reports ? (
               <p className="text-primary-700 w-full">{reports}</p>
             ) : (
-              <p className="text-primary-700">Hello {profile.name}!</p>
+              <p className="text-primary-700">Hello {profile?.name}!</p>
             )}
           </div>
         </div>

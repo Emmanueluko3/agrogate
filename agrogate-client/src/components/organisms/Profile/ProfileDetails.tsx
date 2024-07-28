@@ -1,4 +1,4 @@
-import { faCloudArrowUp, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import Button from "../../atoms/buttons/button";
@@ -72,7 +72,7 @@ const ProfileDetails: React.FC = () => {
       );
       const formData = new FormData();
       formData.append("name", name);
-      formData.append("userName", username);
+      formData.append("username", username);
       formData.append("bio", bio);
       formData.append("image", profile_imageBlob);
       formData.append("coverPhoto", cover_imageBlob);
@@ -104,55 +104,55 @@ const ProfileDetails: React.FC = () => {
     }
   };
 
-  const handleUpdateProfileImage = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("profile_image", profileData?.profile_image);
-      const response: any = await globalAxios.patch(
-        "/api/v1/profile",
-        formData,
-        {
-          headers: {
-            ...globalAxios.defaults.headers.common,
-            "Content-Type": "multipart/form-data",
-            Accept: "application/json",
-          },
-        }
-      );
-      if (response?.data?.data) {
-        console.log("Successful! 🎉 ");
-        dispatch(fetchProfile());
-      }
-    } catch (error: any) {
-      console.error("Error ", error);
-      setprofileData();
-    }
-  };
+  // const handleUpdateProfileImage = async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("profile_image", profileData?.profile_image);
+  //     const response: any = await globalAxios.patch(
+  //       "/api/v1/profile",
+  //       formData,
+  //       {
+  //         headers: {
+  //           ...globalAxios.defaults.headers.common,
+  //           "Content-Type": "multipart/form-data",
+  //           Accept: "application/json",
+  //         },
+  //       }
+  //     );
+  //     if (response?.data?.data) {
+  //       console.log("Successful! 🎉 ");
+  //       dispatch(fetchProfile());
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error ", error);
+  //     setprofileData();
+  //   }
+  // };
 
-  const handleUpdateCoverImage = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("cover_image", profileData?.cover_image);
-      const response: any = await globalAxios.patch(
-        "/api/v1/profile",
-        formData,
-        {
-          headers: {
-            ...globalAxios.defaults.headers.common,
-            "Content-Type": "multipart/form-data",
-            Accept: "application/json",
-          },
-        }
-      );
-      if (response?.data?.data) {
-        console.log("Successful! 🎉 ");
-        dispatch(fetchProfile());
-      }
-    } catch (error: any) {
-      console.error("Error ", error);
-      setprofileData();
-    }
-  };
+  // const handleUpdateCoverImage = async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("cover_image", profileData?.cover_image);
+  //     const response: any = await globalAxios.patch(
+  //       "/api/v1/profile",
+  //       formData,
+  //       {
+  //         headers: {
+  //           ...globalAxios.defaults.headers.common,
+  //           "Content-Type": "multipart/form-data",
+  //           Accept: "application/json",
+  //         },
+  //       }
+  //     );
+  //     if (response?.data?.data) {
+  //       console.log("Successful! 🎉 ");
+  //       dispatch(fetchProfile());
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error ", error);
+  //     setprofileData();
+  //   }
+  // };
 
   const handleInputChange = (
     event: React.ChangeEvent<
@@ -198,10 +198,10 @@ const ProfileDetails: React.FC = () => {
       setProfileData({ ...profileData, [name]: file });
     }
 
-    if (profileData.cover_image || profileData.profile_image) {
-      profileData.profile_image && handleUpdateProfileImage();
-      profileData.cover_image && handleUpdateCoverImage();
-    }
+    // if (profileData.cover_image || profileData.profile_image) {
+    //   profileData.profile_image && handleUpdateProfileImage();
+    //   profileData.cover_image && handleUpdateCoverImage();
+    // }
   };
 
   const userPost = (
@@ -221,11 +221,16 @@ const ProfileDetails: React.FC = () => {
       </div>
       {/* Profile Pictures */}
       <div className="rounded-lg bg-slate-500 lg:h-52 h-28 relative lg:mb-20 mb-14">
+        <button
+          onClick={() => cover_imageInputRef?.current?.click()}
+          className="p-2 cursor-pointer py-0 text-gray-300 rounded-lg text-2xl absolute drop-shadow-2xl bg-slate-50 bg-opacity-15 hover:bg-opacity-25 backdrop-blur-sm top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        >
+          <FontAwesomeIcon icon={faCamera} />
+        </button>
         <img
           src={profileData?.cover_image ? profileData?.cover_image : CoverPhoto}
           alt=""
-          onClick={() => cover_imageInputRef?.current?.click()}
-          className="h-full w-full rounded-lg cursor-pointer"
+          className="h-full w-full rounded-lg"
         />
         <input
           type="file"
@@ -249,7 +254,7 @@ const ProfileDetails: React.FC = () => {
               >
                 <FontAwesomeIcon
                   className="text-2xl text-gray-300"
-                  icon={faCloudArrowUp}
+                  icon={faCamera}
                 />
               </button>
             </div>
@@ -265,7 +270,7 @@ const ProfileDetails: React.FC = () => {
               >
                 <FontAwesomeIcon
                   className="text-2xl text-gray-300"
-                  icon={faCloudArrowUp}
+                  icon={faCamera}
                 />
               </button>
             </div>
