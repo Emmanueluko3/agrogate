@@ -17,7 +17,7 @@ const apiService = (url: string, method: string, data?: object | string) => {
       })
       .catch((error) => {
         if (error?.message === "Network Error") {
-          toast.error("Please check your internet connection");
+          toast.error("Unknown Error occurred");
           console.error("Please check your internet connection");
         }
         return reject(error);
