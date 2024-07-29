@@ -1,10 +1,11 @@
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
+const { StatusCodes } = require("http-status-codes");
 const openai = require("../config/openai");
 
 const detectDiseaseController = asyncErrorHandler(async (req, res) => {
-  const base64Image = "base64";
+  const base64Image = req.body.image;
   const chatCompletion = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
+    model: "gpt-4o",
     messages: [
       {
         role: "system",
@@ -20,7 +21,7 @@ const detectDiseaseController = asyncErrorHandler(async (req, res) => {
           {
             type: "image_url",
             image_url: {
-              url: `data:image/jpeg;base64,${base64Image}`,
+              url: base64Image,
             },
           },
         ],
