@@ -9,6 +9,7 @@ import {
   faHeartPulse,
 } from "@fortawesome/free-solid-svg-icons";
 import apiService from "../../../api/apiService";
+import { Skeleton } from "@mui/material";
 
 const Diagnose: React.FC = () => {
   const profile: any = useAppSelector((state) => state?.profile?.profile);
@@ -148,14 +149,32 @@ const Diagnose: React.FC = () => {
             Reports
           </h2>
           <div className="flex-1 p-4 h-80 overflow-y-auto relative w-full">
-            <FontAwesomeIcon
-              className="text-8xl opacity-5 absolute drop-shadow-2xl z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-              icon={faBook}
-            />
-            {reports ? (
-              <p className="text-primary-700 w-full">{reports}</p>
+            {isLoading ? (
+              <div className="w-full">
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton />
+                <Skeleton animation="wave" />
+                <Skeleton />
+              </div>
             ) : (
-              <p className="text-primary-700">Hello {profile?.name}!</p>
+              <>
+                <FontAwesomeIcon
+                  className="text-8xl opacity-5 absolute drop-shadow-2xl z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  icon={faBook}
+                />
+                {reports ? (
+                  <p className="text-primary-700 w-full">{reports}</p>
+                ) : (
+                  <p className="text-primary-700">Hello {profile?.name}!</p>
+                )}
+              </>
             )}
           </div>
         </div>
