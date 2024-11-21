@@ -29,7 +29,7 @@ const registerUserController = asyncErrorHandler(async (req, res) => {
     );
   }
 
-  // Hash the password
+  // Send Hash the password
   const hashedPassword = await bcrypt.hash(result.data.password, 10);
 
   const createdUser = await User.create({
